@@ -120,5 +120,15 @@ class DB_Session(models.Model):
 
 
 class DB_Subjects(models.Model):
-    class_name=models.CharField(max_length=50, null=True, choices=CLASS)
+    class_name=models.CharField(max_length=50, null=True, choices=CLASS) 
     subject_name=models.CharField(max_length=100, null=True)
+
+
+class DB_Result(models.Model):
+    student_prn_no=models.CharField(max_length=100, null=True)
+    subject_name=models.CharField(max_length=100, null=True)
+    min_marks=models.CharField(max_length=100, null=True)
+    obtained_marks=models.CharField(max_length=100, null=True)
+    out_off_marks=models.CharField(max_length=100, null=True)
+    percentage=models.CharField(max_length=100, null=True)
+    result=models.CharField(max_length=100, null=True)

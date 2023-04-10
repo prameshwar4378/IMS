@@ -219,7 +219,9 @@
                   <div class="photo">
                     <center>
                       <div style="width: 150px; height: 150px; border:1px solid gray; ">
+                        {% if data.student_profile %}
                         <img src="{{data.student_profile.url}}" alt="" style="width:100%; height: 100%;">
+                        {% endif %}
                       </div>
                     </center>
                   </div>

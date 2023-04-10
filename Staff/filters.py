@@ -1,6 +1,6 @@
 import django_filters
 from django import forms
-from Developer.models import DB_Fees
+from Developer.models import DB_Fees,CustomUser
 from django_filters import DateFilter
 from django.forms import DateInput
 
@@ -20,3 +20,14 @@ class DueFees_Filter(django_filters.FilterSet):
         widgets = {
             'due_date': DateInput(attrs={'type': 'date'})
         }
+
+
+
+
+class Student_name_Filter(django_filters.FilterSet):
+     class Meta:
+        model = CustomUser
+        fields = ['student_class']
+        # widgets = {
+        #     'due_date': DateInput(attrs={'type': 'date'})
+        # }

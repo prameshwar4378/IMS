@@ -53,9 +53,11 @@
                                         <center>
                                             <a href="{% url 'student_dashboard' r.id %}"
                                             class="btn btn-warning px-3">Manage</a>
+                                            <a href="{% url 'student_result_dashboard' r.id %}"
+                                            class="btn btn-primary px-3">Result</a>
                                         <a href="{% url 'delete_student' r.id %}"
                                             class="btn btn-danger px-3">Delete</a>
-                                        </center>
+                                    </center>
 
                                     </td>
                                 </tr>
@@ -79,6 +81,9 @@
     </section>
 
 </main><!-- End #main -->
+
+
+
 
 
 <script>

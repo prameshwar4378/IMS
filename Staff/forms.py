@@ -1,6 +1,6 @@
 
 from django.contrib.auth.forms import UserCreationForm
-from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Subjects
+from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.utils import timezone
@@ -73,7 +73,7 @@ class Form_Academic_Session_Staff(forms.ModelForm):
 
  
 # Education Session for Staff 
-class Form_Subjects(forms.ModelForm):
+class Form_Subject(forms.ModelForm):
     class Meta:
         model=DB_Subjects
         fields='__all__'

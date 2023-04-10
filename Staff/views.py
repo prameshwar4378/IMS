@@ -1,20 +1,17 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .forms import CustomStudentCreationForm,Form_Academic_Session_Staff,Form_Subjects
-from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Subjects
+from .forms import CustomStudentCreationForm,Form_Academic_Session_Staff,Form_Subject
+from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects
 from Staff.forms import FormStudentReceivedFees,FormAddFees
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa 
 from django.db.models import Q
-from .filters import DueFees_Filter
-
+from .filters import DueFees_Filter,Student_name_Filter
 
 # Create your views here.
 
@@ -105,7 +102,7 @@ def student_dashboard(request,id):
  
     total_pending=total_fees - collected_fees
     
-    fees_rec=DB_Fees.objects.all()
+
 
     form_receive_fees = FormStudentReceivedFees()
     form_add_fees = FormAddFees()
@@ -249,22 +246,75 @@ def export_excel_deu_records(request):
 
 def manage_subjects(request):
     rec=DB_Subjects.objects.all()
-    form=Form_Subjects()
+    form=Form_Subject()
     if request.method=="POST":
-        form=Form_Subjects(request.POST)
+        form=Form_Subject(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request,'Subject Added Successfully')
-            form=Form_Subjects()
+            form=Form_Subject()
             return redirect('/Staff/manage_subjects/')
     else:
-        form=Form_Subjects()
+        form=Form_Subject()
     context={'form':form,'rec':rec}
     return render(request,'subjects.html',context)
 
 
 def delete_subject(request,id):
-        pi=DB_Subjects.objects.get(pk=id)
+        pi=DB_Result.objects.get(pk=id)
         pi.delete()
         messages.success(request,'Subject Deleted Successfully!!!')
         return redirect('/Staff/manage_subjects/')
+ 
+def student_result_dashboard(request,id):
+    student_profile_record=CustomUser.objects.get(id=id)
+    result_record=DB_Result.objects.all()
+    # student_name=student_record.student_name
+    if request.method == 'POST':
+        # Get data from POST request
+        student_prn_no = request.POST.get('student_prn_no')
+        subject_name = request.POST.get('subject_name')
+        min_marks = request.POST.get('min_marks')
+        obtained_marks = request.POST.get('obtained_marks')
+        out_off_marks = request.POST.get('out_off_marks')
+        percentage = request.POST.get('percentage')
+        result = request.POST.get('result')
+
+        save_result = DB_Result(
+            student_prn_no=student_prn_no,
+            subject_name=subject_name,
+            min_marks=min_marks,
+            obtained_marks=obtained_marks,
+            out_off_marks=out_off_marks,
+            percentage=percentage,
+            result=result
+        )
+        save_result.save()
+        messages.success(request,'Marks Added Successfully!!!')
+
+    
+
+    subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class)
+    context={'subject_name':subjects,'data':student_profile_record,'result_record':result_record}
+    return render(request,'student_result_dashboard.html',context)
+
+
+def create_result(request):
+    rec=CustomUser.objects.filter(is_student=True)
+    Filter=Student_name_Filter(request.GET, queryset=rec)
+    get_records=Filter.qs 
+
+    context={'rec':get_records,'filter':Filter}
+    return render(request,'create_result.html',context)
+
+
+def delete_result(request,id):
+        # pi=DB_Result.objects.get(pk=id)
+        # id_for_page_redirect=CustomUser.objects.get(student_prn_no=pi.student_prn_no).id
+        # print(id_for_page_redirect)
+        # print(id_for_page_redirect)
+        # print(id_for_page_redirect) 
+        # pi.delete()
+        # messages.success(request,'Result Deleted Successfully!!!')
+        return redirect('/Staff/manage_subjects/')
+ 

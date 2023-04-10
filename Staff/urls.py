@@ -21,6 +21,9 @@ urlpatterns = [
     path('export_excel_deu_records/', Staff_view.export_excel_deu_records, name='export_excel_deu_records'),
     path('manage_subjects/', Staff_view.manage_subjects, name='manage_subjects'),
     path('delete_subject/<int:id>', Staff_view.delete_subject, name='delete_subject'),
+    path('student_result_dashboard/<int:id>', Staff_view.student_result_dashboard, name='student_result_dashboard'), 
+    path('create_result', Staff_view.create_result, name='create_result'), 
+    path('delete_result', Staff_view.delete_result, name='delete_result'), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
