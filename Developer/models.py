@@ -132,3 +132,14 @@ class DB_Result(models.Model):
     out_off_marks=models.CharField(max_length=100, null=True)
     percentage=models.CharField(max_length=100, null=True)
     result=models.CharField(max_length=100, null=True)
+    exam_title=models.CharField(max_length=100, null=True)
+    exam_start_date=models.CharField(max_length=100, null=True)
+    exam_end_date=models.CharField(max_length=100, null=True)
+
+class DB_Schedule_Exam(models.Model):
+    class_name=models.CharField(max_length=100, null=True,choices=CLASS)
+    exam_title=models.CharField(max_length=100, null=True) 
+    exam_start_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
+    exam_end_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
+
+

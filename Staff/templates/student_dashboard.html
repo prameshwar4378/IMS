@@ -22,10 +22,11 @@
                     <div class="col-sm-11">
                         <a href="{% url 'update_student_profile' data.id %}" class="btn btn-primary">Update Profile</a>
                         <a href="{% url 'print_admission_form' data.id %}" class="btn btn-primary">Prints</a>
+                        <a href="{% url 'student_result_dashboard' data.id %}" class="btn btn-primary">Results</a>
                         <a href="#" class="btn btn-success" data-toggle="modal"
                             data-target="#StudentReceivedFeesForm">Received Fees</a>
-                        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#StudentAddFeesForm">Add
-                            Fees</a>
+                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#StudentAddFeesForm">Add
+                                Fees</a>
                     </div>
                     <div class="col-sm-1">
                         <a href="" class="btn btn-danger" data-toggle="modal"

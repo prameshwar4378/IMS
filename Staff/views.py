@@ -1,6 +1,6 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .forms import CustomStudentCreationForm,Form_Academic_Session_Staff,Form_Subject
-from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects
+from .forms import CustomStudentCreationForm,Form_Academic_Session_Staff,Form_Subject,Form_Schedule_Exam
+from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam
 from Staff.forms import FormStudentReceivedFees,FormAddFees
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -268,53 +268,98 @@ def delete_subject(request,id):
  
 def student_result_dashboard(request,id):
     student_profile_record=CustomUser.objects.get(id=id)
-    result_record=DB_Result.objects.all()
+    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no)
+    exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class).order_by('-id')
+
     # student_name=student_record.student_name
     if request.method == 'POST':
         # Get data from POST request
-        student_prn_no = request.POST.get('student_prn_no')
-        subject_name = request.POST.get('subject_name')
-        min_marks = request.POST.get('min_marks')
-        obtained_marks = request.POST.get('obtained_marks')
-        out_off_marks = request.POST.get('out_off_marks')
-        percentage = request.POST.get('percentage')
-        result = request.POST.get('result')
+        if 'add_result' in request.POST:
+            student_prn_no = request.POST.get('student_prn_no')
+            subject_name = request.POST.get('subject_name')
+            min_marks = request.POST.get('min_marks')
+            obtained_marks = request.POST.get('obtained_marks')
+            out_off_marks = request.POST.get('out_off_marks')
+            percentage = request.POST.get('percentage')
+            result = request.POST.get('result')
+            exam_data = request.POST.get('cmb_exam_name')
+            exam_title, exam_start_date, exam_end_date = exam_data.split(" | ")
 
-        save_result = DB_Result(
-            student_prn_no=student_prn_no,
-            subject_name=subject_name,
-            min_marks=min_marks,
-            obtained_marks=obtained_marks,
-            out_off_marks=out_off_marks,
-            percentage=percentage,
-            result=result
-        )
-        save_result.save()
-        messages.success(request,'Marks Added Successfully!!!')
+            save_result = DB_Result(
+                student_prn_no=student_prn_no,
+                subject_name=subject_name,
+                min_marks=min_marks,
+                obtained_marks=obtained_marks,
+                out_off_marks=out_off_marks,
+                percentage=percentage,
+                result=result,
+                exam_title=exam_title,
+                exam_start_date=exam_start_date,
+                exam_end_date=exam_end_date
+            )
+            save_result.save()
+            messages.success(request,'Marks Added Successfully!!!')
+        elif 'txt_update_result_id' in request.POST:
+            result_id = request.POST.get('txt_update_result_id')
+            update_exam_data = request.POST.get('cmb_update_exam_name')
+            update_exam_title, update_exam_start_date, update_exam_end_date = update_exam_data.split(" | ")
+        
+            # Select the record with the given ID and update its fields
+            DB_Result.objects.filter(id=result_id).update(
+                student_prn_no=request.POST.get('txt_update_student_prn_no'),
+                subject_name=request.POST.get('cmb_update_subject_name'),
+                min_marks=request.POST.get('txt_update_min_marks'),
+                obtained_marks=request.POST.get('txt_update_obtained_marks'),
+                out_off_marks=request.POST.get('txt_update_out_off_marks'),
+                percentage=request.POST.get('txt_update_percentage'),
+                result=request.POST.get('txt_update_result'),
+                exam_title=update_exam_title,
+                exam_start_date=update_exam_start_date,
+                exam_end_date=update_exam_end_date
+            )
+            
+            messages.success(request, 'Marks Updated Successfully!!!')
 
-    
-
+    labels = []
+    data_chart = []
+    if result_record.count() != 0:
+        for i in result_record:
+            labels.append(str(i.subject_name))
+            data_chart.append(int(i.obtained_marks))
+ 
     subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class)
-    context={'subject_name':subjects,'data':student_profile_record,'result_record':result_record}
+    context={'subject_name':subjects,'st_data':student_profile_record,'result_record':result_record,'exam_record':exam_name,'labels':labels,'data':data_chart}
     return render(request,'student_result_dashboard.html',context)
 
 
-def create_result(request):
-    rec=CustomUser.objects.filter(is_student=True)
-    Filter=Student_name_Filter(request.GET, queryset=rec)
-    get_records=Filter.qs 
-
-    context={'rec':get_records,'filter':Filter}
-    return render(request,'create_result.html',context)
-
 
 def delete_result(request,id):
-        # pi=DB_Result.objects.get(pk=id)
-        # id_for_page_redirect=CustomUser.objects.get(student_prn_no=pi.student_prn_no).id
-        # print(id_for_page_redirect)
-        # print(id_for_page_redirect)
-        # print(id_for_page_redirect) 
-        # pi.delete()
-        # messages.success(request,'Result Deleted Successfully!!!')
-        return redirect('/Staff/manage_subjects/')
+        pi=DB_Result.objects.get(pk=id)
+        id_for_page_redirect=CustomUser.objects.get(student_prn_no=pi.student_prn_no).id
+        pi.delete()
+        messages.success(request,'Result Deleted Successfully!!!')
+        return redirect(f'/Staff/student_result_dashboard/{id_for_page_redirect}')
+ 
+
+def schedule_exam(request):
+    rec=DB_Schedule_Exam.objects.all()
+    form=Form_Schedule_Exam()
+    if request.method=="POST":
+        form=Form_Schedule_Exam(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,'Exam Created Successfully')
+            form=Form_Schedule_Exam()
+            return redirect('/Staff/schedule_exam/')
+    else:
+        form=Form_Schedule_Exam()
+    context={'form':form,'rec':rec}
+    return render(request,'schedule_exam.html',context)
+
+
+def delete_exam_schedule(request,id):
+        pi=DB_Schedule_Exam.objects.get(pk=id)
+        pi.delete()
+        messages.success(request,'Exam  Deleted Successfully!!!')
+        return redirect('/Staff/schedule_exam/')
  

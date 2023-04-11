@@ -1,6 +1,6 @@
 
 from django.contrib.auth.forms import UserCreationForm
-from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects
+from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects,DB_Schedule_Exam
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.utils import timezone
@@ -78,4 +78,15 @@ class Form_Subject(forms.ModelForm):
         model=DB_Subjects
         fields='__all__'
 
-                
+
+ 
+# Schedult Exam For Student
+class Form_Schedule_Exam(forms.ModelForm):
+    class Meta:
+        model=DB_Schedule_Exam
+        fields='__all__'
+        widgets={
+            'exam_start_date': forms.TextInput(attrs={'type': 'date'}),
+            'exam_end_date': forms.TextInput(attrs={'type': 'date'}),
+        }
+
