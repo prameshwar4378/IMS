@@ -144,8 +144,10 @@
                 </button>
             </div>
             <div class="modal-body">
+                <form action="" method="POST">
+                    {% csrf_token %}
                     <label for="report_type" class="form-label requiredField mt-1">Select Option</label>
-                    <select name="" id="report_type" class="form-control " onchange=generate_report()>
+                    <select name="report_type" id="report_type" class="form-control " onchange=generate_report() required>
                     <option value="">------</option>
                     <option value="Subject Wise">Subject Wise</option>
                     <option value="Exam Wise">Exam Wise</option>
@@ -174,9 +176,11 @@
                 
                 <span>
                     <center>
-                        <button type="submit" class="btn btn-primary mt-3 px-4">Generate</button>
+                        <input type="submit" class="btn btn-primary mt-3 px-4"></input>
                     </center>
                 </span>
+
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -288,7 +292,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <input type="hidden" name="txt_update_result_id" id="txt_update_result_id">
-                            <input type="hidden" name="student_prn_no" id="student_prn_no"
+                            <input type="hidden" name="txt_update_student_prn_no" id="student_prn_no"
                                 value={{st_data.student_prn_no}}>
 
                             <label for="cmb_update_exam_name" class="form-label requiredField mt-4">Select Exam

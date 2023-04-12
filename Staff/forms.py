@@ -88,5 +88,15 @@ class Form_Schedule_Exam(forms.ModelForm):
         widgets={
             'exam_start_date': forms.TextInput(attrs={'type': 'date'}),
             'exam_end_date': forms.TextInput(attrs={'type': 'date'}),
+            'academic_session': forms.TextInput(attrs={'value': 'date'}),
         }
+        def save(self, commit=True):
+            instance = super().save(commit=False)
+            # Get the session value using the request object from the form
+            session_value = self.request.session.get('my_key')
+            # Set the model field value to the session value
+            instance.my_field = session_value
+            if commit:
+                instance.save()
+            return instance
 

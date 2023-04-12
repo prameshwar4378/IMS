@@ -52,7 +52,7 @@ class CustomUser(AbstractUser):
     # fields for Student 
     is_student=models.BooleanField(default=False)
     student_profile=models.ImageField( upload_to="student_profile/", null=True,blank=True)
-    student_prn_no=models.IntegerField(null=True)
+    student_prn_no=models.IntegerField(null=True,unique=True)
     student_admission_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
     academic_session_student=models.CharField(max_length=255,null=True,blank=True, choices=FINANCIAL_YEAR)
     student_name=models.CharField(max_length=255,null=True)
@@ -94,6 +94,7 @@ PAYMENT_MODE = (
 class DB_Fees(models.Model):
     add_fees=models.DecimalField(max_digits=10, decimal_places=2,null=True)
     fees_remark=models.CharField(max_length=250,null=True)
+    academic_session=models.CharField(max_length=100, null=True)
 
     student_username=models.CharField(max_length=250,null=True)
     operator_username=models.CharField(max_length=250,null=True) #this field used for checking Operator Name
@@ -125,6 +126,7 @@ class DB_Subjects(models.Model):
 
 
 class DB_Result(models.Model):
+    academic_session=models.CharField(max_length=100, null=True)
     student_prn_no=models.CharField(max_length=100, null=True)
     subject_name=models.CharField(max_length=100, null=True)
     min_marks=models.CharField(max_length=100, null=True)
@@ -137,6 +139,7 @@ class DB_Result(models.Model):
     exam_end_date=models.CharField(max_length=100, null=True)
 
 class DB_Schedule_Exam(models.Model):
+    academic_session=models.CharField(max_length=100, null=True,default="2022-23")
     class_name=models.CharField(max_length=100, null=True,choices=CLASS)
     exam_title=models.CharField(max_length=100, null=True) 
     exam_start_date=models.DateField(auto_now=False, auto_now_add=False,null=True)

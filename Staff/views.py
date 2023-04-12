@@ -12,7 +12,7 @@ from django.template.loader import get_template
 from xhtml2pdf import pisa 
 from django.db.models import Q
 from .filters import DueFees_Filter,Student_name_Filter
-
+from . import export
 # Create your views here.
 
 def update_education_session(request):
@@ -214,34 +214,14 @@ def due_update(request,id):
         fm=FormStudentReceivedFees(instance=pi)
     return render(request,"update_due_record.html",{'form':fm})
 
-
+from . import export
 def export_pdf_deu_records(request):
-    template = get_template('export_pdf_due_records.html')
-    due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0))
-    Filter=DueFees_Filter(request.GET, queryset=due_records)
-    rec2=Filter.qs 
-    total_value = rec2.aggregate(Sum('due_amount'))
-    total_due_amount = str(total_value['due_amount__sum'])
-    context={'rec':rec2,'total_due_amount':total_due_amount}
-  
-    html = template.render(context)
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="Due Records.pdf"'
-    pdf = pisa.CreatePDF(BytesIO(html.encode('utf-8')), response)
-    if not pdf.err:
-        return response
-    return HttpResponse('Error generating PDF file: %s' % pdf.err, status=400)
+    responce = export.export_pdf_due(request)
+    return responce
 
-import csv
+
 def export_excel_deu_records(request):
-    responce=HttpResponse(content_type='text/csv')
-    writer=csv.writer(responce)
-    writer.writerow(['student_prn_no','student_name','pay_date','payment_mode','amount','due_date','due_amount','due_remark'])
-    for data in DB_Fees.objects.all().values_list('student_prn_no','student_name','pay_date','payment_mode','amount','due_date','due_amount','due_remark'):
-       writer.writerow(data)
-    
-    # return redirect('/become_a_partner_records/')
-    responce['Content-Disposition'] = 'attachment; filename="Student Due Records.csv"'
+    responce = export.export_excel_deu()
     return responce
 
 def manage_subjects(request):
@@ -274,7 +254,7 @@ def student_result_dashboard(request,id):
     # student_name=student_record.student_name
     if request.method == 'POST':
         # Get data from POST request
-        if 'add_result' in request.POST:
+        if 'add_result' in request.POST: 
             student_prn_no = request.POST.get('student_prn_no')
             subject_name = request.POST.get('subject_name')
             min_marks = request.POST.get('min_marks')
@@ -299,7 +279,7 @@ def student_result_dashboard(request,id):
             )
             save_result.save()
             messages.success(request,'Marks Added Successfully!!!')
-        elif 'txt_update_result_id' in request.POST:
+        elif 'txt_update_result_id' in request.POST: 
             result_id = request.POST.get('txt_update_result_id')
             update_exam_data = request.POST.get('cmb_update_exam_name')
             update_exam_title, update_exam_start_date, update_exam_end_date = update_exam_data.split(" | ")
@@ -317,8 +297,15 @@ def student_result_dashboard(request,id):
                 exam_start_date=update_exam_start_date,
                 exam_end_date=update_exam_end_date
             )
-            
             messages.success(request, 'Marks Updated Successfully!!!')
+        elif 'report_type' in request.POST:
+            report_type=request.POST.get('report_type')
+            if report_type == "Subject Wise":
+                pass
+            elif report_type == "Exam Wise":
+                exam_name=request.POST.get('select_exam_for_report')
+                print(exam_name)
+                
 
     labels = []
     data_chart = []
@@ -335,6 +322,7 @@ def student_result_dashboard(request,id):
 
 def delete_result(request,id):
         pi=DB_Result.objects.get(pk=id)
+
         id_for_page_redirect=CustomUser.objects.get(student_prn_no=pi.student_prn_no).id
         pi.delete()
         messages.success(request,'Result Deleted Successfully!!!')
