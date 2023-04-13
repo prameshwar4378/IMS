@@ -31,9 +31,8 @@
             <div class="col-lg-12">
                 <div class="row">
                     <div class="container" style="width:95%; text-align:right;">
-                        <a href="{% url 'student_dashboard' st_data.id %}" class="btn btn-primary" style="width:100px;" ><b><i class="bi bi-currency-rupee"></i> Fees</b></a>
-                        <a href="#" class="btn btn-primary" style="width:180px;" data-toggle="modal"  data-target="#generate_report"><b><i class="bi bi-envelope-paper"></i> Generate Report</b></a>
-                        <a href="#" class="btn btn-primary" style="width:130px;" data-toggle="modal"  data-target="#add_result"><b><i class="bi bi-plus-lg"></i> Add Result</b></a>
+                        <a href="#" class="btn btn-primary" style="width:130px;" data-toggle="modal"  data-target="#add_result"><b><i class="bi bi-plus-lg"></i> Add Marks</b></a>
+                        <a href="#" class="btn btn-success" style="width:180px;" data-toggle="modal"  data-target="#generate_report"><b><i class="bi bi-envelope-paper"></i> Download Result</b></a>
                     </div>
                     
 
@@ -155,7 +154,7 @@
                 
                 <span id="subject_select_generate_report" style="display:none;">
                     <label for="select_subject_for_report" class="form-label requiredField mt-3">Select Subject</label>
-                    <select name="" id="select_subject_for_report" class="form-control">
+                    <select name="select_subject_for_report" id="select_subject_for_report" class="form-control">
                         <option value="">------</option>
                         {% for i in subject_name %}
                         <option value="{{i.subject_name}}">{{i.subject_name}}</option>
@@ -176,7 +175,7 @@
                 
                 <span>
                     <center>
-                        <input type="submit" class="btn btn-primary mt-3 px-4"></input>
+                        <input type="submit" class="btn btn-primary mt-3 px-4" value="View Result">
                     </center>
                 </span>
 
@@ -209,6 +208,8 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <input type="hidden" name="add_result" id="add_result">
+                            <input type="hidden" name="student_class" id="student_class" value="{{st_data.student_class}}">
+                            <input type="hidden" name="add_academic_session" id="add_academic_session">
                             <input type="hidden" name="student_prn_no" id="student_prn_no"
                                 value={{st_data.student_prn_no}}>
                             <label for="cmb_exam_name" class="form-label requiredField mt-4">Select Exam *</label>
@@ -292,6 +293,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <input type="hidden" name="txt_update_result_id" id="txt_update_result_id">
+                            <input type="hidden" name="txt_update_academic_session" id="txt_update_academic_session">
                             <input type="hidden" name="txt_update_student_prn_no" id="student_prn_no"
                                 value={{st_data.student_prn_no}}>
 
@@ -371,6 +373,9 @@
 
 
 <script>
+            document.getElementById("add_academic_session").value="{{request.user.academic_session}}"
+            document.getElementById("txt_update_academic_session").value="{{request.user.academic_session}}"
+
     function generate_report()
     {
         const selectElement = document.getElementById('report_type'); // select the element by its ID

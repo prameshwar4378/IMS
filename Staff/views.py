@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .forms import CustomStudentCreationForm,Form_Academic_Session_Staff,Form_Subject,Form_Schedule_Exam
+from .forms import CustomStudentCreationForm,Form_academic_session,Form_Subject,Form_Schedule_Exam
 from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam
 from Staff.forms import FormStudentReceivedFees,FormAddFees
 from django.contrib import messages
@@ -19,12 +19,12 @@ def update_education_session(request):
     name=request.user.username
     
     user = CustomUser.objects.get(username=name)
-    user.academic_session_staff = '2022-23'
+    user.academic_session = '2022-23'
     user.save()
-    fm=Form_Academic_Session_Staff()
+    fm=Form_academic_session()
     if request.method == 'POST':
-            my_field_value = request.POST.get('academic_session_staff')
-            user.academic_session_staff = my_field_value
+            my_field_value = request.POST.get('academic_session')
+            user.academic_session = my_field_value
             user.save()
             messages.success(request, 'Session Updated Success...!.')
             return redirect('/Staff')
@@ -40,14 +40,14 @@ def home(request):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def student_list(request):
-    rec=CustomUser.objects.filter(is_student=True)
+    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session)
     return render(request,'student_list.html',{'rec':rec})
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def new_admission(request):
-    session_student=request.user.academic_session_staff
-    record=CustomUser.objects.filter(academic_session_student=session_student,is_student=True)
+    session_student=request.user.academic_session
+    record=CustomUser.objects.filter(academic_session=session_student,is_student=True)
     student_count=str(record.count()+1)
 
     split_session1=session_student[-5:-3]
@@ -63,14 +63,14 @@ def new_admission(request):
             return redirect('/Staff/new_admission/')
     else:
         form = CustomStudentCreationForm()
-    return render(request,'admission_form.html', {'form': form,'academic_session_student':session_student,'auto_prn':prn_no})
+    return render(request,'admission_form.html', {'form': form,'academic_session':session_student,'auto_prn':prn_no})
 
 
 # Student dashboard
 # Add fees form
 def student_panel(request):
-    active_students=CustomUser.objects.filter(is_student=True).count()
-    due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0)).count()
+    active_students=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session).count()
+    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0, academic_session=request.user.academic_session).count()
     context={'active_students':active_students,'due_records':due_records}
     return render(request,'student_panel.html',context)
 
@@ -190,7 +190,7 @@ def print_fees_receipt(request,id):
 
 
 def due_list(request):
-    due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0))
+    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0, academic_session=request.user.academic_session)
     Filter=DueFees_Filter(request.GET, queryset=due_records)
     rec2=Filter.qs 
     total_students=rec2.count()
@@ -214,7 +214,6 @@ def due_update(request,id):
         fm=FormStudentReceivedFees(instance=pi)
     return render(request,"update_due_record.html",{'form':fm})
 
-from . import export
 def export_pdf_deu_records(request):
     responce = export.export_pdf_due(request)
     return responce
@@ -245,16 +244,21 @@ def delete_subject(request,id):
         pi.delete()
         messages.success(request,'Subject Deleted Successfully!!!')
         return redirect('/Staff/manage_subjects/')
- 
+
+
+
 def student_result_dashboard(request,id):
-    student_profile_record=CustomUser.objects.get(id=id)
-    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no)
-    exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class).order_by('-id')
+    student_profile_record=CustomUser.objects.get(id=id
+                                                  )
+    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session)
+    exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class,academic_session=request.user.academic_session).order_by('-id')
 
     # student_name=student_record.student_name
     if request.method == 'POST':
         # Get data from POST request
         if 'add_result' in request.POST: 
+            academic_session = request.POST.get('add_academic_session')
+            student_class = request.POST.get('student_class')
             student_prn_no = request.POST.get('student_prn_no')
             subject_name = request.POST.get('subject_name')
             min_marks = request.POST.get('min_marks')
@@ -266,8 +270,10 @@ def student_result_dashboard(request,id):
             exam_title, exam_start_date, exam_end_date = exam_data.split(" | ")
 
             save_result = DB_Result(
+                academic_session=academic_session,
                 student_prn_no=student_prn_no,
                 subject_name=subject_name,
+                student_class=student_class,
                 min_marks=min_marks,
                 obtained_marks=obtained_marks,
                 out_off_marks=out_off_marks,
@@ -286,6 +292,7 @@ def student_result_dashboard(request,id):
         
             # Select the record with the given ID and update its fields
             DB_Result.objects.filter(id=result_id).update(
+                academic_session=request.POST.get('txt_update_academic_session'),
                 student_prn_no=request.POST.get('txt_update_student_prn_no'),
                 subject_name=request.POST.get('cmb_update_subject_name'),
                 min_marks=request.POST.get('txt_update_min_marks'),
@@ -301,19 +308,82 @@ def student_result_dashboard(request,id):
         elif 'report_type' in request.POST:
             report_type=request.POST.get('report_type')
             if report_type == "Subject Wise":
-                pass
+                subject_name_1=request.POST.get('select_subject_for_report')
+                student_prn_no=student_profile_record.student_prn_no
+                responce = export.export_result_report_subject_wise(subject_name_1,student_prn_no)
+                return responce
+
             elif report_type == "Exam Wise":
-                exam_name=request.POST.get('select_exam_for_report')
-                print(exam_name)
+                exam_name_1=request.POST.get('select_exam_for_report')
+                title_1, start_date_1, end_date_1 = exam_name_1.split(" | ")
+                st_name=student_profile_record.student_name
+                st_prn=student_profile_record.student_prn_no
+
+                result_data = DB_Result.objects.filter(exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1)
                 
+                if result_data:
+                    student_class = result_data.first().student_class
+                    st_class=student_class
+
+
+                labels_charts = []
+                data_charts = []
+                st_total_obtained=0
+                st_total_out_off=0
+                st_total_min=0
+                st_result=[]
+                for i in result_data:
+                    labels_charts.append(i.subject_name)
+                    data_charts.append(i.obtained_marks)
+                    st_total_obtained+=int(i.obtained_marks)
+                    st_total_out_off+=int(i.out_off_marks)
+                    st_total_min+=int(i.min_marks)
+                    st_result.append(i.result)
+
+                if "Fail" in st_result:
+                    st_result="Fail"
+                else:
+                    st_result="Pass"
+
+                if st_total_out_off >0:
+                    st_percentage=(st_total_obtained/st_total_out_off)*100
+                else:
+                    st_percentage="---"
+                    
+                st_profile=student_profile_record.student_profile
+
+
+                context={'rec':result_data,
+                         'st_profile':st_profile,
+                         'st_name':st_name,
+                         'st_prn':st_prn,
+                         'st_class':st_class,
+                         'exam_title':title_1,
+                         'exam_start_date':start_date_1,
+                         'exam_end_date':end_date_1,
+                         'st_total_min':st_total_min,
+                         'st_total_obtained':st_total_obtained,
+                         'st_total_out_off':st_total_out_off,
+                         'st_percentage':st_percentage,
+                         'st_result':st_result,
+                         'labels_charts':labels_charts,
+                         'data_charts':data_charts,
+                         }
+                return render(request,'print_result_exam_wise.html',context)
+            
+        return redirect('student_result_dashboard', id=id)        
 
     labels = []
     data_chart = []
     if result_record.count() != 0:
         for i in result_record:
-            labels.append(str(i.subject_name))
-            data_chart.append(int(i.obtained_marks))
- 
+            if i.subject_name not in labels:
+                labels.append(str(i.subject_name))
+            index_val=labels.index(i.subject_name)
+            if index_val < len(data_chart):
+                data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
+            else:
+                data_chart.append(int(i.obtained_marks))
     subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class)
     context={'subject_name':subjects,'st_data':student_profile_record,'result_record':result_record,'exam_record':exam_name,'labels':labels,'data':data_chart}
     return render(request,'student_result_dashboard.html',context)
@@ -330,7 +400,7 @@ def delete_result(request,id):
  
 
 def schedule_exam(request):
-    rec=DB_Schedule_Exam.objects.all()
+    rec=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session)
     form=Form_Schedule_Exam()
     if request.method=="POST":
         form=Form_Schedule_Exam(request.POST)

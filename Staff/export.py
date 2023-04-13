@@ -1,4 +1,4 @@
-from Developer.models import DB_Fees
+from Developer.models import DB_Fees,DB_Result
 from .filters import DueFees_Filter
 from django.template.loader import get_template
 from django.db.models import Sum,Q
@@ -35,6 +35,15 @@ def export_excel_deu():
     responce['Content-Disposition'] = 'attachment; filename="Student Due Records.csv"'
     return responce
 
-def export_result_report_exam_wise(request):
-    pass
+def export_result_report_subject_wise(subject,prn):
 
+    template = get_template('export_pdf_result_subject_wise.html')
+    result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn)
+    context={'rec':result_records}
+    html = template.render(context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Result.pdf"'
+    pdf = pisa.CreatePDF(BytesIO(html.encode('utf-8')), response)
+    if not pdf.err:
+        return response
+    return HttpResponse('Error generating PDF file: %s' % pdf.err, status=400)

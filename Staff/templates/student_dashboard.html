@@ -214,6 +214,7 @@
                         <div class="modal-body">
                             <form action="" method="POST" id="first-form" novalidate>
                                 {% csrf_token %}
+                                {{fees_form.academic_session|as_crispy_field}}
                                 {{fees_form.student_prn_no|as_crispy_field}}
                                 {{fees_form.student_username|as_crispy_field}}
                                 {{fees_form.student_name|as_crispy_field}}
@@ -252,6 +253,7 @@
                         <div class="modal-body">
                             <form action="" method="POST" id="second-form" novalidate>
                                 {% csrf_token %}
+                                <span >{{ add_fees_form.academic_session|as_crispy_field}}</span>
                                 {{add_fees_form.student_username|as_crispy_field}}
                                 {{add_fees_form.student_prn_no|as_crispy_field}}
                                 {{add_fees_form.add_fees|as_crispy_field}}
@@ -299,6 +301,12 @@
 </div>
 
 
+<script>
+    {% comment %} document.getElementById('id_academic_session').value="{{request.user.academic_session}}" {% endcomment %}
+    document.querySelector('#first-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
+    document.querySelector('#second-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
+
+</script>
 
 <script>
     var firstForm = document.getElementById("first-form");

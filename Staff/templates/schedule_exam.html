@@ -8,11 +8,11 @@
 <main id="main" class="main">
 
     <div class="pagetitle">
-        <h1>Manage Subjects</h1>
+        <h1>Schedule Exam</h1>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item"><a href="#">Manage Subjects</a></li>
+                <li class="breadcrumb-item"><a href="#">Schedule Exam</a></li>
             </ol>
         </nav>
         {% comment %} <a href="{% url 'new_admission' %}" class="btn btn-primary text-light"
@@ -91,6 +91,9 @@
 </main><!-- End #main -->
 
  
+<script>
+    document.getElementById('id_academic_session').value="{{request.user.academic_session}}"
+</script>
 
 <script>
     $(document).ready( function () {

@@ -19,12 +19,12 @@ FINANCIAL_YEAR = (
 
 class CustomStudentCreationForm(UserCreationForm):
     student_admission_date = forms.DateField(initial=timezone.now().date(), widget=forms.DateInput(attrs={'type': 'date'}))
-    # academic_session_student=forms.ChoiceField(choices=FINANCIAL_YEAR, widget=forms.Select(attrs={'onchange': 'Call_Get_PRN_Function()', 'class': 'form-control'}))
+    # academic_session=forms.ChoiceField(choices=FINANCIAL_YEAR, widget=forms.Select(attrs={'onchange': 'Call_Get_PRN_Function()', 'class': 'form-control'}))
     class Meta:
         model = CustomUser
-        fields = ('is_student','username','academic_session_student','student_profile','student_name','student_gender','student_dob','student_village','student_taluka','student_dist','parent_name','parent_mobile','parent_village','parent_taluka','parent_dist','student_collage','student_collage_address','batch','group','student_prn_no','student_admission_date','student_class','student_mobile','status','password1','password2')
+        fields = ('is_student','username','academic_session','student_profile','student_name','student_gender','student_dob','student_village','student_taluka','student_dist','parent_name','parent_mobile','parent_village','parent_taluka','parent_dist','student_collage','student_collage_address','batch','group','student_prn_no','student_admission_date','student_class','student_mobile','status','password1','password2')
         widgets = { 
-            # 'academic_session_student': forms.ChoiceField(choices=FINANCIAL_YEAR,attrs={'onChange': 'Call_Get_PRN_Function()'}),
+            # 'academic_session': forms.ChoiceField(choices=FINANCIAL_YEAR,attrs={'onChange': 'Call_Get_PRN_Function()'}),
             'student_dob': forms.TextInput(attrs={'type': 'date'}),
             'student_name': forms.TextInput(attrs={'autofocus': True}),
         }
@@ -34,8 +34,9 @@ class CustomStudentCreationForm(UserCreationForm):
 class FormStudentReceivedFees(forms.ModelForm):
     class Meta:
         model = DB_Fees
-        fields = ('student_username','operator_username','operator_name','student_prn_no','student_name','student_class','received_remark','received_amount','amount_word','payment_mode','due_date','due_amount','due_remark')
+        fields = ('academic_session','student_username','operator_username','operator_name','student_prn_no','student_name','student_class','received_remark','received_amount','amount_word','payment_mode','due_date','due_amount','due_remark')
         widgets={
+            'academic_session':forms.HiddenInput(), 
             'student_prn_no':forms.HiddenInput(),
             'student_name':forms.HiddenInput(),
             'student_username':forms.HiddenInput(),
@@ -52,12 +53,12 @@ class FormStudentReceivedFees(forms.ModelForm):
 class FormAddFees(forms.ModelForm):
     class Meta:
         model = DB_Fees
-        fields = ('add_fees','fees_remark','student_prn_no','student_username')
+        fields = ('academic_session','add_fees','fees_remark','student_prn_no','student_username')
         widgets={
+            'academic_session':forms.HiddenInput(), 
             'student_prn_no':forms.HiddenInput(), 
             'student_username':forms.HiddenInput(), 
         }
-
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,10 +67,10 @@ class FormAddFees(forms.ModelForm):
 
  
 # Education Session for Staff 
-class Form_Academic_Session_Staff(forms.ModelForm):
+class Form_academic_session(forms.ModelForm):
     class Meta:
         model=CustomUser
-        fields=('academic_session_staff',)
+        fields=('academic_session',)
 
  
 # Education Session for Staff 
@@ -88,7 +89,7 @@ class Form_Schedule_Exam(forms.ModelForm):
         widgets={
             'exam_start_date': forms.TextInput(attrs={'type': 'date'}),
             'exam_end_date': forms.TextInput(attrs={'type': 'date'}),
-            'academic_session': forms.TextInput(attrs={'value': 'date'}),
+            'academic_session': forms.TextInput(attrs={'type': 'hidden'}),
         }
         def save(self, commit=True):
             instance = super().save(commit=False)

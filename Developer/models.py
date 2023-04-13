@@ -35,15 +35,14 @@ class CustomUser(AbstractUser):
     # Genaral fields 
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=255,null=True,unique=True)
+    academic_session=models.CharField(max_length=255,null=True,blank=True, choices=FINANCIAL_YEAR,default="2022-23")
 
     # fields for Institute 
     is_institute=models.BooleanField(default=False)
-    academic_session_institute=models.CharField(max_length=255,null=True, choices=FINANCIAL_YEAR)
     institute_profile=models.ImageField( upload_to="institute_profile/", null=True,blank=True)
     institute_name = models.CharField(max_length=255,null=True)
 
     # fields for Staff 
-    academic_session_staff = models.CharField(max_length=255,null=True, choices=FINANCIAL_YEAR)
     staff_name=models.CharField(max_length=255,null=True)
     staff_id_no=models.IntegerField(null=True)
     staff_profile=models.ImageField( upload_to="staff_profile/", null=True,blank=True)
@@ -54,7 +53,6 @@ class CustomUser(AbstractUser):
     student_profile=models.ImageField( upload_to="student_profile/", null=True,blank=True)
     student_prn_no=models.IntegerField(null=True,unique=True)
     student_admission_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
-    academic_session_student=models.CharField(max_length=255,null=True,blank=True, choices=FINANCIAL_YEAR)
     student_name=models.CharField(max_length=255,null=True)
     student_gender=models.CharField(max_length=255,null=True)
     student_dob=models.DateField(auto_now=False, auto_now_add=False,null=True)
@@ -129,6 +127,7 @@ class DB_Result(models.Model):
     academic_session=models.CharField(max_length=100, null=True)
     student_prn_no=models.CharField(max_length=100, null=True)
     subject_name=models.CharField(max_length=100, null=True)
+    student_class=models.CharField(max_length=100, null=True)
     min_marks=models.CharField(max_length=100, null=True)
     obtained_marks=models.CharField(max_length=100, null=True)
     out_off_marks=models.CharField(max_length=100, null=True)
@@ -139,7 +138,7 @@ class DB_Result(models.Model):
     exam_end_date=models.CharField(max_length=100, null=True)
 
 class DB_Schedule_Exam(models.Model):
-    academic_session=models.CharField(max_length=100, null=True,default="2022-23")
+    academic_session=models.CharField(max_length=100, null=True)
     class_name=models.CharField(max_length=100, null=True,choices=CLASS)
     exam_title=models.CharField(max_length=100, null=True) 
     exam_start_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
