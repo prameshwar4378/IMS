@@ -2,7 +2,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-
+GENDER = (
+    ("Male", "Male"), 
+    ("Female", "Female"), 
+    
+)  
 
 FINANCIAL_YEAR = (
     ("2022-23", "2022-23"), 
@@ -39,14 +43,13 @@ class CustomUser(AbstractUser):
 
     # fields for Institute 
     is_institute=models.BooleanField(default=False)
-    institute_profile=models.ImageField( upload_to="institute_profile/", null=True,blank=True)
+    institute_logo=models.ImageField( upload_to="institute_logo/", null=True,blank=True)
     institute_name = models.CharField(max_length=255,null=True)
 
     # fields for Staff 
     staff_name=models.CharField(max_length=255,null=True)
     staff_id_no=models.IntegerField(null=True)
     staff_profile=models.ImageField( upload_to="staff_profile/", null=True,blank=True)
-    institute_name_staff = models.CharField(max_length=255,null=True)
 
     # fields for Student 
     is_student=models.BooleanField(default=False)
@@ -54,13 +57,12 @@ class CustomUser(AbstractUser):
     student_prn_no=models.IntegerField(null=True,unique=True)
     student_admission_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
     student_name=models.CharField(max_length=255,null=True)
-    student_gender=models.CharField(max_length=255,null=True)
+    student_gender=models.CharField(max_length=255,null=True,choices=GENDER)
     student_dob=models.DateField(auto_now=False, auto_now_add=False,null=True)
     student_mobile=models.CharField(max_length=255,null=True)
     student_village=models.CharField(max_length=255,null=True)
     student_taluka=models.CharField(max_length=255,null=True)
     student_dist=models.CharField(max_length=255,null=True)
-    institute_name_student = models.CharField(max_length=255,null=True)
 
     parent_name=models.CharField(max_length=255,null=True,blank=True)
     parent_mobile=models.CharField(max_length=255,null=True,blank=True)
@@ -72,8 +74,8 @@ class CustomUser(AbstractUser):
     student_collage_address=models.CharField(max_length=255,null=True,blank=True)
     
     student_class=models.CharField(max_length=255,null=True,choices=CLASS)
-    batch=models.CharField(max_length=255,null=True)
-    group=models.CharField(max_length=255,null=True)
+    batch=models.CharField(max_length=255,null=True,blank=True)
+    group=models.CharField(max_length=255,null=True,blank=True)
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
 
 
@@ -110,13 +112,8 @@ class DB_Fees(models.Model):
     due_remark=models.CharField(max_length=250,null=True,blank=True)
 
 
-
-
-
 class DB_Session(models.Model):
     financial_year=models.CharField(max_length=50, null=True, choices=FINANCIAL_YEAR)
-
-
 
 class DB_Subjects(models.Model):
     class_name=models.CharField(max_length=50, null=True, choices=CLASS) 

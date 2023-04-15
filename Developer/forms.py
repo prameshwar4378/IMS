@@ -6,7 +6,8 @@ from django.contrib.auth.forms  import AuthenticationForm
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ('username','email', 'institute_name','institute_profile','is_staff','is_institute','password1','password2')
+        fields = ('username','email', 'institute_name','institute_logo','is_staff','is_institute','password1','password2')
+
 
 
 class login_form(AuthenticationForm):

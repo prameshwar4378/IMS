@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='customuser',
             name='academic_session',
-            field=models.CharField(blank=True, choices=[('2022-23', '2022-23'), ('2023-24', '2023-24'), ('2024-25', '2024-25'), ('2025-26', '2025-26'), ('2026-27', '2026-27'), ('2028-28', '2028-28')], default='2022-23', max_length=255, null=True),
+            field=models.CharField(blank=True, choices=[('2022-23', '2022-23'), ('2023-24', '2023-24'), ('2024-25', '2024-25'), ('2025-26', '2025-26'), ('2026-27', '2026-27'), ('2028-28', '2028-28')], max_length=255, null=True),
         ),
     ]

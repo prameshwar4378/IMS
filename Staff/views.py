@@ -19,7 +19,6 @@ def update_education_session(request):
     name=request.user.username
     
     user = CustomUser.objects.get(username=name)
-    user.academic_session = '2022-23'
     user.save()
     fm=Form_academic_session()
     if request.method == 'POST':
