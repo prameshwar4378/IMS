@@ -24,6 +24,7 @@ CLASS = (
     ("2nd Standerd", "2nd Standerd"), 
     ("3rd Standerd", "3rd Standerd"), 
     ("4th Standerd", "4th Standerd"), 
+    ("5th Standerd", "5th Standerd"), 
     ("6th Standerd", "6th Standerd"), 
     ("7th Standerd", "7th Standerd"), 
     ("8th Standerd", "8th Standerd"), 
@@ -45,8 +46,10 @@ class CustomUser(AbstractUser):
     is_institute=models.BooleanField(default=False)
     institute_logo=models.ImageField( upload_to="institute_logo/", null=True,blank=True)
     institute_name = models.CharField(max_length=255,null=True)
+    institute_address = models.CharField(max_length=500,null=True)
 
     # fields for Staff 
+    is_staff=models.BooleanField(default=False)
     staff_name=models.CharField(max_length=255,null=True)
     staff_id_no=models.IntegerField(null=True)
     staff_profile=models.ImageField( upload_to="staff_profile/", null=True,blank=True)
@@ -78,16 +81,18 @@ class CustomUser(AbstractUser):
     group=models.CharField(max_length=255,null=True,blank=True)
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
 
+    REQUIRED_FIELDS = ['is_staff']
+
 
 
 
 
 
 PAYMENT_MODE = (
-    (" Cash", " Cash"), 
-    (" Phone Pay", " Phone Pay"), 
-    (" Google Pay", " Google Pay"), 
-    (" Amazone Pay", " Amazone Pay"), 
+    ("Cash", "Cash"), 
+    ("Phone Pay", "Phone Pay"), 
+    ("Google Pay", "Google Pay"), 
+    ("Amazone Pay", "Amazone Pay"), 
     ("Other Online", "Other Online"), 
 )   
 
@@ -141,4 +146,11 @@ class DB_Schedule_Exam(models.Model):
     exam_start_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
     exam_end_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
 
+class DB_Attendance(models.Model):
+    academic_session=models.CharField(max_length=100, null=True)
+    student_name=models.CharField(max_length=50,null=True)
+    student_prn_no=models.CharField(max_length=50,null=True)
+    student_class=models.CharField(max_length=50,null=True)
+    attendance_date = models.DateField(null=True)
+    attendance_status = models.BooleanField(default=False)
 

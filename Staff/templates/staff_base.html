@@ -56,15 +56,17 @@
 </head>
 
 <style>
-  
+  body{
+    background:#F6FBFE;
+  }
   /* Info Cards */
   .dashboard .info-card {
     padding-bottom: 10px;
-    border-radius:10px;
-    box-shadow:0px 0px 12px -5px;
+    border-radius:7px;
+    box-shadow:0px 0px 7px -5px;
   }
   .dashboard .info-card:hover {
-      box-shadow:0px 0px 15px -3px;
+      box-shadow:0px 0px 10px -5px;
       transition:0.4s;
       background:#D8F0F9;
     }
@@ -87,7 +89,7 @@
   }
   
   .dashboard .sales-card .card-icon {
-    color: #4154f1;
+    color: #02B4C3;
     background: #f6f6fe;
   }
   
@@ -160,7 +162,7 @@
   <ul class="sidebar-nav" id="sidebar-nav">
 
       <li class="nav-item">
-          <a class="nav-link " href="">
+          <a class="nav-link " href="{% url 'staff_dashboard' %}">
               <i class="bi bi-grid"></i>
               <span>DASHBOARD</span>
           </a>
@@ -174,13 +176,34 @@
       </li>
 
       <li class="nav-item">
-          <a class="nav-link " href="{% url 'student_panel' %}">
-              <i class="bi bi-person"></i>
-              <span>STUDENTS</span>
-          </a>
-      </li>
+        <a class="nav-link " href="{% url 'student_fees_list' %}">
+          <i class="bi bi-currency-rupee"></i>
+            <span>FEES</span>
+        </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link " href="{% url 'due_list' %}">
+        <i class="bi bi-card-list"></i>
+          <span>DUE RECORDS</span>
+      </a>
+    </li>
 
       
+  <li class="nav-item">
+    <a class="nav-link " href="{% url 'student_attendance_list' %}">
+      <i class="bi bi-people"></i>
+        <span>ATTENDANCE</span>
+    </a>
+  </li>
+  
+  <li class="nav-item">
+    <a class="nav-link " href="{% url 'student_result_list' %}">
+      <i class="bi bi-bookmarks"></i>
+        <span>RESULT</span>
+    </a>
+  </li>
+
     <li class="nav-item">
       <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
         <i class="bi bi-layout-text-window-reverse"></i><span>Customize Settings</span><i class="bi bi-chevron-down ms-auto"></i>

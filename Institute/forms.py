@@ -12,6 +12,7 @@ class CustomStaffCreationForm(UserCreationForm):
         fields = ('username','staff_profile','staff_name','email','staff_id_no','is_staff','password1','password2')
 
 
+
 class Form_Financial_Year_Session(forms.ModelForm):
     financial_year = forms.CharField(
         max_length=7,

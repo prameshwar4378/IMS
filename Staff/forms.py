@@ -1,6 +1,6 @@
 
 from django.contrib.auth.forms import UserCreationForm
-from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects,DB_Schedule_Exam
+from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.utils import timezone
@@ -101,3 +101,17 @@ class Form_Schedule_Exam(forms.ModelForm):
                 instance.save()
             return instance
 
+
+from datetime import date
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = DB_Attendance
+        fields = ('student_prn_no', 'student_name', 'attendance_status')
+        widgets={
+            'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
+            'student_name': forms.TextInput(attrs={'class':'form-control'}),
+            'attendance_status': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+        }
+
+ 

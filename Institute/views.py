@@ -14,7 +14,11 @@ def add_staff(request):
     if request.method == 'POST':
         form = CustomStaffCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            fm = form.save(commit=False)
+            fm.institute_name = request.user.institute_name
+            fm.institute_address = request.user.institute_address
+            fm.institute_logo = request.user.institute_logo
+            fm.save()
             form = CustomStaffCreationForm()
             messages.success(request,'Staff Added Successfully...!')
             return redirect('/Institute/add_staff/')

@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .forms import CustomStudentCreationForm,Form_academic_session,Form_Subject,Form_Schedule_Exam
-from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam
-from Staff.forms import FormStudentReceivedFees,FormAddFees
+from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance
+from Staff.forms import FormStudentReceivedFees,FormAddFees,AttendanceForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
@@ -10,10 +10,10 @@ from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 from xhtml2pdf import pisa 
-from django.db.models import Q
 from .filters import DueFees_Filter,Student_name_Filter
 from . import export
-# Create your views here.
+from django.forms import formset_factory
+
 
 def update_education_session(request):
     name=request.user.username
@@ -31,16 +31,25 @@ def update_education_session(request):
     contaxt={'name':name,'form':fm}
     return render(request,'update_education_session.html',contaxt)
 
-@user_passes_test(lambda user: user.is_staff)
-@login_required(login_url='/login/')
-def home(request):
-    return render(request,'staff_dashboard.html')
+
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
-def student_list(request):
+def staff_dashboard(request):
+    return render(request,'staff_dashboard.html')
+
+
+
+
+
+
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def student_fees_list(request):
     rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session)
-    return render(request,'student_list.html',{'rec':rec})
+    return render(request,'student_fees_list.html',{'rec':rec})
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
@@ -56,6 +65,10 @@ def new_admission(request):
     if request.method == 'POST':
         form = CustomStudentCreationForm(request.POST, request.FILES)
         if form.is_valid():
+            fm = form.save(commit=False)
+            fm.institute_name = request.user.institute_name
+            fm.institute_address = request.user.institute_address
+            fm.institute_logo = request.user.institute_logo
             form.save()
             messages.success(request, 'Registration Success...!.')
             form = CustomStudentCreationForm()
@@ -77,7 +90,7 @@ def student_panel(request):
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
-def student_dashboard(request,id):
+def student_fees_dashboard(request,id):
     dt=get_object_or_404(CustomUser,id=id)
     prn_no=dt.student_prn_no
     rec = DB_Fees.objects.filter(student_prn_no=prn_no)
@@ -122,13 +135,14 @@ def student_dashboard(request,id):
                 messages.success(request, 'Fees Added Successfully...!')
                 form_add_fees = FormAddFees()
                 return redirect(f'/Staff/student_dashboard/{id}')
+  
     else:
         form_receive_fees = FormStudentReceivedFees()
         form_add_fees = FormAddFees()
 
     context ={'fees_form':form_receive_fees,'add_fees_form':form_add_fees,'data':dt,'fees_rec':rec,'total_fees':total_fees,'collected_fees':collected_fees,'pending_dues':pending_dues,'total_pending':total_pending}
 
-    return render(request,"student_dashboard.html",context )
+    return render(request,"student_fees_dashboard.html",context )
 
 
 
@@ -157,7 +171,7 @@ def delete_student(request,id):
         pi=CustomUser.objects.get(pk=id)
         pi.delete()
         messages.success(request,'Profile Deleted Successfully!!!')
-        return redirect('/Staff/student_list/')
+        return redirect('/Staff/student_fees_list/')
 
 
 
@@ -244,6 +258,10 @@ def delete_subject(request,id):
         messages.success(request,'Subject Deleted Successfully!!!')
         return redirect('/Staff/manage_subjects/')
 
+
+def student_result_list(request):
+    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session)
+    return render(request,'student_result_list.html',{'rec':rec})
 
 
 def student_result_dashboard(request,id):
@@ -350,11 +368,17 @@ def student_result_dashboard(request,id):
                     st_percentage="---"
                     
                 st_profile=student_profile_record.student_profile
+                institute_name=student_profile_record.institute_name
+                institute_logo=student_profile_record.institute_logo
+                institute_address=student_profile_record.institute_address
 
 
                 context={'rec':result_data,
                          'st_profile':st_profile,
                          'st_name':st_name,
+                         'institute_name':institute_name,
+                         'institute_logo':institute_logo,
+                         'institute_address':institute_address,
                          'st_prn':st_prn,
                          'st_class':st_class,
                          'exam_title':title_1,
@@ -368,6 +392,7 @@ def student_result_dashboard(request,id):
                          'labels_charts':labels_charts,
                          'data_charts':data_charts,
                          }
+                
                 return render(request,'print_result_exam_wise.html',context)
             
         return redirect('student_result_dashboard', id=id)        
@@ -419,4 +444,88 @@ def delete_exam_schedule(request,id):
         pi.delete()
         messages.success(request,'Exam  Deleted Successfully!!!')
         return redirect('/Staff/schedule_exam/')
+
  
+import calendar
+def student_attendance_list(request):
+    month_names = list(calendar.month_name)
+    class_name=""
+    attedance_records=DB_Attendance.objects.filter(academic_session=request.user.academic_session)
+    if request.method=="POST":
+        if 'txt_set_session_date' in request.POST:
+            request.session['get_session_date']=request.POST.get('txt_set_session_date'),
+            request.session['get_session_class']=request.POST.get('cmb_set_session_class_name'),
+        
+            if request.session.get('get_session_class'):
+                class_name=request.session.get('get_session_class')
+                for i in class_name:
+                    class_name=i
+                student_record=CustomUser.objects.filter(is_student=True,student_class=class_name,academic_session=request.user.academic_session).count()
+                if student_record > 0:
+                    return redirect('/Staff/create_attendance/')
+        elif 'cmb_month_export' in request.POST:
+            class_name=request.POST.get('cmb_class_name_export'),
+            month_name=request.POST.get('cmb_month_export'),
+            class_name=class_name[0]
+            month_name=month_name[0]
+            responce=export_attendance(request,class_name,month_name)
+            return responce
+
+    labels_charts = ['Present','Absent']
+    data_charts = []
+    total=attedance_records.count()
+    present=0
+    absent=0
+    for i in attedance_records:
+        if i.attendance_status==True:
+            present+=1
+        else:
+            absent+=1
+
+    data_charts.append(present)
+    data_charts.append(absent)
+            
+    return render(request,'student_attendance_list.html',{'class_name':class_name,'month_names':month_names,'labels_charts':labels_charts,'data_charts':data_charts})
+
+
+def create_attendance(request):  
+    session_date=request.session.get('get_session_date')
+    for i in session_date:
+        session_date=i        
+    session_class_name=request.session.get('get_session_class')
+    for i in session_class_name:
+        session_class_name=i
+
+
+    student_record=CustomUser.objects.filter(is_student=True,student_class=session_class_name,academic_session=request.user.academic_session)
+    initial_data = [{'student_name': student.student_name, 'student_prn_no': student.student_prn_no} for student in student_record]
+    MyFormSet = formset_factory(AttendanceForm, extra=0)
+
+    if request.method == 'POST':
+        formset = MyFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                fm = form.save(commit=False)
+                fm.student_class = session_class_name
+                fm.attendance_date = session_date
+                fm.academic_session = request.user.academic_session
+                form.save()
+            messages.success(request,'Attendance Submited Successfully!!!')
+            return redirect('/Staff/student_attendance_list/')
+    else: 
+        formset = MyFormSet(initial=initial_data)
+    return render(request, "create_attendance.html",{'formset':formset,'date':session_date,'class_name':session_class_name,'student_record':student_record})
+
+import csv
+
+def export_attendance(request,class_name,month_name):
+        month_number = datetime.strptime(month_name, "%B").month # get the month number from the month name
+        attendance_data = DB_Attendance.objects.filter(attendance_date__month=month_number,student_class=class_name,academic_session=request.user.academic_session)
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="attendance.csv"'
+        writer = csv.writer(response)
+        writer.writerow(['Academic Session', 'Student Name', 'PRN No.', 'Class', 'Attendance Date', 'Attendance Status'])
+        for row in attendance_data:
+            writer.writerow([row.academic_session, row.student_name, row.student_prn_no, row.student_class, row.attendance_date, row.attendance_status])
+        return response
+

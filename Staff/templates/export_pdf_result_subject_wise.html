@@ -48,7 +48,7 @@
     table th {
         background-color: #009879;
         color: #ffffff;
-        padding: 12px 15px;
+        padding: 6px 0px;
         text-align: center;
         font-weight: bold;
     }
@@ -72,20 +72,17 @@
             <br><br>
             <section class="header">
                 <div class="collage_name">
-                    <h3><b>Deogiri Collage sambhajinagar</b></h3>
-                    <p>station road, near wits hotel, sambhajinagar</p>
+                    <span style="font-size:25px; padding:1px; "><b>{{institute_name}}</b></span> <br>
+                    <p>{{institute_address}}</p>
                 </div>
             </section>
-            <br>
-            <hr>
-            <br>
+ 
             <section>
-                &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  Student Name : Rameshwar Pawar 
+                &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  Student Name : <b>{{student_name}}</b>
                 &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp; 
-                Student Class : 10th Standerd
+                Student Class : <b>{{student_class}}</b>
                 &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp;  &nbsp;&nbsp;&nbsp; 
-
-                Student PRN No : 110025
+                Student PRN No : <b>{{student_prn_no}}</b>
             </section>
             {% if rec %}
             <table>

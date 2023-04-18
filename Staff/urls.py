@@ -4,11 +4,11 @@ from Staff import views as Staff_view
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns = [
-    path('', Staff_view.home,name="staff_dashboard"),  
-    path('student_list/', Staff_view.student_list,name="student_list"), 
+    path('', Staff_view.staff_dashboard,name="staff_dashboard"),  
+    path('student_fees_list/', Staff_view.student_fees_list,name="student_fees_list"), 
     path('new_admission/', Staff_view.new_admission,name="new_admission"),  
     path("student_panel/",Staff_view.student_panel, name='student_panel'),  
-    path("student_dashboard/<int:id>",Staff_view.student_dashboard, name='student_dashboard'), 
+    path("student_fees_dashboard/<int:id>",Staff_view.student_fees_dashboard, name='student_fees_dashboard'), 
     path("print_admission_form/<int:id>",Staff_view.print_admission_form, name='print_admission_form'), 
     path("print_fees_receipt/<int:id>",Staff_view.print_fees_receipt, name='print_fees_receipt'),  
     path("update_student_profile/<int:id>",Staff_view.update_student_profile, name='update_student_profile'), 
@@ -21,10 +21,13 @@ urlpatterns = [
     path('export_excel_deu_records/', Staff_view.export_excel_deu_records, name='export_excel_deu_records'),
     path('manage_subjects/', Staff_view.manage_subjects, name='manage_subjects'),
     path('delete_subject/<int:id>', Staff_view.delete_subject, name='delete_subject'),
+    path('student_result_list/', Staff_view.student_result_list, name='student_result_list'),  
     path('student_result_dashboard/<int:id>', Staff_view.student_result_dashboard, name='student_result_dashboard'), 
     path('delete_result/<int:id>', Staff_view.delete_result, name='delete_result'), 
     path('schedule_exam/', Staff_view.schedule_exam, name='schedule_exam'), 
     path('delete_exam_schedule/<int:id>', Staff_view.delete_exam_schedule, name='delete_exam_schedule'), 
+    path('student_attendance_list/', Staff_view.student_attendance_list, name='student_attendance_list'), 
+    path('create_attendance/', Staff_view.create_attendance, name='create_attendance'), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

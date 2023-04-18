@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import login as authlogin, authenticate,logout as DeleteSession
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm,login_form
+from .forms import Custom_Institute_Creation_Form,login_form
 from django.contrib import messages
 
 # Create your views here.
@@ -41,12 +41,12 @@ def institute_list(request):
 
 def add_institute(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST, request.FILES)
+        form = Custom_Institute_Creation_Form(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             messages.success(request,'Institute Added Successfully ...!')
             return redirect('/Developer/add_institute/')
             # login(request, user)
     else:
-        form = CustomUserCreationForm()
+        form = Custom_Institute_Creation_Form()
     return render(request, 'add_institute.html', {'form': form})

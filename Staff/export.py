@@ -1,4 +1,4 @@
-from Developer.models import DB_Fees,DB_Result
+from Developer.models import DB_Fees,DB_Result,CustomUser,DB_Attendance
 from .filters import DueFees_Filter
 from django.template.loader import get_template
 from django.db.models import Sum,Q
@@ -36,10 +36,25 @@ def export_excel_deu():
     return responce
 
 def export_result_report_subject_wise(subject,prn):
-
     template = get_template('export_pdf_result_subject_wise.html')
     result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn)
-    context={'rec':result_records}
+    profile_rec=CustomUser.objects.get(student_prn_no=prn)
+    print()
+    print(profile_rec.institute_name)
+    print(profile_rec.institute_logo)
+    institute_address=profile_rec.institute_address
+    institute_name=profile_rec.institute_name
+    institute_logo=profile_rec.institute_logo
+    student_name=profile_rec.student_name
+    student_class=profile_rec.student_class
+    context={
+        'rec':result_records,
+        "institute_address":institute_address,
+        "institute_name":institute_name,
+        "institute_logo":institute_logo,
+        "student_name":student_name,
+        "student_class":student_class,
+        "student_prn_no":prn}
     html = template.render(context)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Result.pdf"'
@@ -47,3 +62,45 @@ def export_result_report_subject_wise(subject,prn):
     if not pdf.err:
         return response
     return HttpResponse('Error generating PDF file: %s' % pdf.err, status=400)
+
+
+
+def export_attendance(request):
+    academic_session = "2022-2023"  # Replace with the actual academic session value
+
+    # Get all attendance records for the academic session
+    attendance_records = DB_Attendance.objects.filter(academic_session=academic_session)
+
+    # Group attendance records by month
+    attendance_by_month = {}
+    for record in attendance_records:
+        month = record.attendance_date.strftime("%B")  # Get the month name
+        if month not in attendance_by_month:
+            attendance_by_month[month] = []
+        attendance_by_month[month].append(record)
+
+    # Define the CSV header and rows
+    csv_header = ["Month", "Student Name", "PRN No.", "Class", "Attendance Date", "Attendance Status"]
+    csv_rows = []
+    for month, records in attendance_by_month.items():
+        for record in records:
+            row = [
+                month,
+                record.academic_session,
+                record.student_name,
+                record.student_prn_no,
+                record.student_class,
+                record.attendance_date.strftime("%Y-%m-%d"),
+                "Present" if record.attendance_status else "Absent"
+            ]
+            csv_rows.append(row)
+
+    # Write CSV response
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="attendance_{academic_session}.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(csv_header)
+    writer.writerows(csv_rows)
+
+    return response
