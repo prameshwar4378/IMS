@@ -24,14 +24,27 @@
             <!-- Left side columns -->
             <div class="col-lg-12" >
                     <div class="row">
-                    
+                        
+                        {% if attendancea_alredy_taken %}
+                        <div class="alert alert-warning" style="display:flex;flex-direction:row;">
+                            <div style="width:95%">
+                                <span class="">{{attendancea_alredy_taken}}</span>
+                            </div>
+                            
+                            <div style="width:5%">
+                                <a href=""><i class="bi bi-x-circle-fill"></i></a>
+                            </div>
+                            
+                        </div>
+                        {% endif %}
+                        
                         <div class="col-sm-6 mt-3">
                             <div class="row">
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-4"  data-toggle="modal" data-target="#create_attendance" style="cursor:pointer;">
                                     <div style="width:100%; height:auto; border:1px solid gray; background:white; border-radius:10px; padding:15px; box-shadow:0px 0px 10px -3px;">
                                         <center>
-                                            <img src="{% static 'img/profile_sample.jpg' %}" alt="" style="width:60px; height:60px; border:1px solid gray; border-radius:50%;">
+                                            <img src="{% static 'img/attendance_entry_icon.png' %}" alt="" style="width:60px; height:60px; border:1px solid gray; border-radius:50%;">
                                             <br>
                                             <h5 class="mt-2"><b>New Entry</b></h5>
                                         </center>
@@ -47,7 +60,7 @@
                                 <div class="col-sm-4"   data-toggle="modal" data-target="#export_attendance" style="cursor:pointer;">
                                     <div style="width:100%; height:auto; border:1px solid gray; background:white; border-radius:10px; padding:15px; box-shadow:0px 0px 10px -3px;">
                                         <center>
-                                            <img src="{% static 'img/profile_sample.jpg' %}" alt="" style="width:60px; height:60px; border:1px solid gray; border-radius:50%;">
+                                            <img src="{% static 'img/attendance_export_icon.png' %}" alt="" style="width:60px; height:60px; border:1px solid gray; border-radius:50%;">
                                             <br>
                                             <h5 class="mt-2"><b>Export</b></h5>
                                         </center>
@@ -63,7 +76,7 @@
                     <div class="row mt-4">
                         <div class="col-sm-6">
                             <div style="padding:10px;  box-shadow:0px 0px 10px -4px; border-radius:8px;">
-                                <div class=" " style="background:rgb(3, 119, 202); color:white; padding:7px; padding-left:15px; text-align:center; border-radius:8px;"><b>Short Whole Records</b></div>
+                                <div class=" " style="background:#02B4C3; color:white; padding:7px; padding-left:15px; text-align:center; border-radius:8px;"><b>Short Whole Records</b></div>
                                 <div>
                                     <canvas id="pie-chart"></canvas> 
                                 </div>
@@ -72,7 +85,7 @@
     
                         <div class="col-sm-6">
                             <div style="padding:10px;  box-shadow:0px 0px 10px -4px; border-radius:8px;">
-                                <div class=" " style="background:rgb(3, 119, 202); color:white; padding:7px; padding-left:15px; text-align:center; border-radius:8px;"><b>Short by Student</b></div>
+                                <div class=" " style="background:#02B4C3; color:white; padding:7px; padding-left:15px; text-align:center; border-radius:8px;"><b>Short by Student</b></div>
                                 <div>
                                      
                                 </div>

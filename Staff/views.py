@@ -13,6 +13,7 @@ from xhtml2pdf import pisa
 from .filters import DueFees_Filter,Student_name_Filter
 from . import export
 from django.forms import formset_factory
+from datetime import date
 
 
 def update_education_session(request):
@@ -36,7 +37,73 @@ def update_education_session(request):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def staff_dashboard(request):
-    return render(request,'staff_dashboard.html')
+    today = date.today()
+    student_records=CustomUser.objects.filter(is_student=True,date_time__date=today,academic_session=request.user.academic_session)
+    today_admission=student_records.count()
+
+    fees_records=DB_Fees.objects.filter(date_time__date=today,received_amount__isnull=False,academic_session=request.user.academic_session)
+    total_fees=0
+    for i in fees_records:
+        total_fees+=int(i.received_amount)
+
+    total_present_students=DB_Attendance.objects.filter(date_time__date=today,attendance_status=True,academic_session=request.user.academic_session).count()
+    total_students=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session).count()
+    if total_students > 0:
+        present_student_in_percentage=(total_present_students/total_students)*100
+    else:
+        present_student_in_percentage=0
+    
+    allocated_fees_DB=DB_Fees.objects.filter(add_fees__isnull=False,academic_session=request.user.academic_session)
+    total_allocated_fees=0
+    for i in allocated_fees_DB:
+        total_allocated_fees+=int(i.add_fees)
+    collected_fees_DB=DB_Fees.objects.filter(received_amount__isnull=False,academic_session=request.user.academic_session)
+    total_collected_amount=0
+    for i in collected_fees_DB:
+        amount=i.received_amount
+        total_collected_amount+=int(amount)
+    total_pending_fees=total_allocated_fees-total_collected_amount
+    label_expenses=['Allocated Fees','Collected Fees','Pending_fees']
+    data_expenses=[total_allocated_fees,total_collected_amount,total_pending_fees]
+
+    student_data_male_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,student_gender="Male").count()
+    student_data_female_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,student_gender="Female").count()
+    label_active_students=['Male','Female']
+    data_active_students=[student_data_male_for_charts,student_data_female_for_charts]
+
+    exam_schedule_records=DB_Schedule_Exam.objects.filter().last()
+    exam_name_for_result_chart = f"{exam_schedule_records.exam_title} ({exam_schedule_records.exam_start_date} To {exam_schedule_records.exam_end_date})"
+    result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title)
+    label_subject_name_result=[]
+    data_marks_result=[]
+    for i in result_records:
+        if i.subject_name in label_subject_name_result:
+            subject_index_value=label_subject_name_result.index(i.subject_name)
+            data_marks_result[subject_index_value]+=int(i.obtained_marks)
+        else:
+            label_subject_name_result.append(i.subject_name)
+            data_marks_result.append(int(i.obtained_marks)) 
+    print()
+    print(label_subject_name_result)
+    print(data_marks_result)
+
+    context={
+            'today_admission':today_admission,
+            'total_fees':total_fees,
+            'total_present_students':total_present_students,
+            'present_student_in_percentage':present_student_in_percentage,
+            'total_allocated_fees':total_allocated_fees,
+            'total_collected_amount':total_collected_amount,
+            'total_pending_fees':total_pending_fees,
+            'labels_charts_expenses':label_expenses,
+             'data_charts_expenses':data_expenses,
+             'label_active_students':label_active_students,
+             'data_active_students':data_active_students,
+            'exam_name_for_result_chart':exam_name_for_result_chart,
+            'label_subject_name_result':label_subject_name_result,
+            'data_marks_result':data_marks_result,
+             }
+    return render(request,'staff_dashboard.html',context)
 
 
 
@@ -56,11 +123,13 @@ def student_fees_list(request):
 def new_admission(request):
     session_student=request.user.academic_session
     record=CustomUser.objects.filter(academic_session=session_student,is_student=True)
-    student_count=str(record.count()+1)
-
+    if record.count()==0:
+        student_count="000"
+    else:
+        student_count=str(record.count()+1)
     split_session1=session_student[-5:-3]
     split_session2=session_student[-2:]
-    prn_no=split_session1+split_session2+str(0)+student_count
+    prn_no=split_session1+split_session2+str("0")+str("0")+str("0")+student_count
 
     if request.method == 'POST':
         form = CustomStudentCreationForm(request.POST, request.FILES)
@@ -126,7 +195,7 @@ def student_fees_dashboard(request,id):
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
                 form_receive_fees = FormStudentReceivedFees()
-                return redirect(f'/Staff/student_dashboard/{id}')
+                return redirect(f'/Staff/student_fees_dashboard/{id}')
         
         elif 'add_fees' in request.POST:
             form_add_fees = FormAddFees(request.POST)
@@ -134,7 +203,7 @@ def student_fees_dashboard(request,id):
                 form_add_fees.save()
                 messages.success(request, 'Fees Added Successfully...!')
                 form_add_fees = FormAddFees()
-                return redirect(f'/Staff/student_dashboard/{id}')
+                return redirect(f'/Staff/student_fees_dashboard/{id}')
   
     else:
         form_receive_fees = FormStudentReceivedFees()
@@ -185,7 +254,7 @@ def delete_fees_record(request,id):
         pi=DB_Fees.objects.get(pk=id)
         pi.delete()
         messages.success(request,'Record Deleted Successfully!!!')
-        return redirect(f'/Staff/student_dashboard/{student_id}')
+        return redirect(f'/Staff/student_fees_dashboard/{student_id}')
         
 
 @user_passes_test(lambda user: user.is_staff)
@@ -450,6 +519,7 @@ import calendar
 def student_attendance_list(request):
     month_names = list(calendar.month_name)
     class_name=""
+    attendancea_alredy_taken=""
     attedance_records=DB_Attendance.objects.filter(academic_session=request.user.academic_session)
     if request.method=="POST":
         if 'txt_set_session_date' in request.POST:
@@ -462,7 +532,13 @@ def student_attendance_list(request):
                     class_name=i
                 student_record=CustomUser.objects.filter(is_student=True,student_class=class_name,academic_session=request.user.academic_session).count()
                 if student_record > 0:
-                    return redirect('/Staff/create_attendance/')
+                    get_date=request.POST.get('txt_set_session_date')
+                    get_class=request.POST.get('cmb_set_session_class_name')
+                    attedance_rec=DB_Attendance.objects.filter(attendance_date=get_date,student_class=get_class).count()
+                    if attedance_rec > 0:
+                        attendancea_alredy_taken="Attendance Alredy Taken"
+                    else:
+                        return redirect('/Staff/create_attendance/')
         elif 'cmb_month_export' in request.POST:
             class_name=request.POST.get('cmb_class_name_export'),
             month_name=request.POST.get('cmb_month_export'),
@@ -485,7 +561,7 @@ def student_attendance_list(request):
     data_charts.append(present)
     data_charts.append(absent)
             
-    return render(request,'student_attendance_list.html',{'class_name':class_name,'month_names':month_names,'labels_charts':labels_charts,'data_charts':data_charts})
+    return render(request,'student_attendance_list.html',{'class_name':class_name,'month_names':month_names,'labels_charts':labels_charts,'data_charts':data_charts,'attendancea_alredy_taken':attendancea_alredy_taken})
 
 
 def create_attendance(request):  

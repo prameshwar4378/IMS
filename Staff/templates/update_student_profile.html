@@ -108,13 +108,22 @@
                             <div class="row mt-3" style="background:#A0D2FF; padding:8px; border-radius:6px;">
                                 <div class="col-sm-12">
                                     <div class="row">
-                                        <h4><b>Create Profile</b></h4>
+                                        <h4><b>Active Status</b></h4>
                                         <hr>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-4">{{form.is_student|as_crispy_field}}</div>
-                                        <div class="col-sm-4">{{form.status|as_crispy_field}}</div> 
-                                    </div>
+                                        <span style="display:none;">{{form.is_student|as_crispy_field}}</span>
+                                        <div class="col-sm-12">{{form.status|as_crispy_field}}</div> 
+                                    </div> 
+                                </div>
+                            </div>
+
+                            <div class="row mt-3" style="background:#A0D2FF; padding:8px; border-radius:6px;">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <h4><b>Create Profile</b></h4>
+                                        <hr>
+                                    </div> 
                                     <div class="row">
                                         <div class="col-sm-4">{{form.username|as_crispy_field}}</div>
                                         <div class="col-sm-4">{{form.password1|as_crispy_field}}</div>

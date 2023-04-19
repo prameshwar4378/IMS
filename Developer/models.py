@@ -80,8 +80,8 @@ class CustomUser(AbstractUser):
     batch=models.CharField(max_length=255,null=True,blank=True)
     group=models.CharField(max_length=255,null=True,blank=True)
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
+    date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
-    REQUIRED_FIELDS = ['is_staff']
 
 
 
@@ -115,6 +115,7 @@ class DB_Fees(models.Model):
     due_date=models.DateField(auto_now=False, auto_now_add=False,blank=True,null=True)
     due_amount=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     due_remark=models.CharField(max_length=250,null=True,blank=True)
+    date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
 
 class DB_Session(models.Model):
@@ -153,4 +154,5 @@ class DB_Attendance(models.Model):
     student_class=models.CharField(max_length=50,null=True)
     attendance_date = models.DateField(null=True)
     attendance_status = models.BooleanField(default=False)
+    date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
