@@ -121,11 +121,22 @@ from datetime import date
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = DB_Attendance
-        fields = ('student_prn_no', 'student_name', 'attendance_status')
+        fields = ('id','student_prn_no', 'student_name', 'is_present')
         widgets={
             'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
             'student_name': forms.TextInput(attrs={'class':'form-control'}),
-            'attendance_status': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+            'is_present': forms.CheckboxInput(attrs={'class':'form-check-input'}),
         }
 
  
+class UpdateAttendanceForm(forms.ModelForm):
+    id = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    class Meta:
+        model = DB_Attendance
+        fields = ('id','student_prn_no', 'student_name', 'is_present')
+        widgets={
+            'id':forms.HiddenInput(), 
+            'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
+            'student_name': forms.TextInput(attrs={'class':'form-control'}),
+            'is_present': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+        }

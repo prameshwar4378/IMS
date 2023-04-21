@@ -91,7 +91,7 @@ def export_attendance(request):
                 record.student_prn_no,
                 record.student_class,
                 record.attendance_date.strftime("%Y-%m-%d"),
-                "Present" if record.attendance_status else "Absent"
+                "Present" if record.is_present else "Absent"
             ]
             csv_rows.append(row)
 

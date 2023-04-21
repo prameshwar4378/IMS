@@ -28,6 +28,8 @@ urlpatterns = [
     path('delete_exam_schedule/<int:id>', Staff_view.delete_exam_schedule, name='delete_exam_schedule'), 
     path('student_attendance_list/', Staff_view.student_attendance_list, name='student_attendance_list'), 
     path('create_attendance/', Staff_view.create_attendance, name='create_attendance'), 
+    path('update_attendance/', Staff_view.update_attendance, name='update_attendance'), 
+    path('inactive_students_list/', Staff_view.inactive_students_list, name='inactive_students_list'), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

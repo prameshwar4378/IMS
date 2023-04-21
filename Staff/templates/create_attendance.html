@@ -60,10 +60,10 @@
                   {% for form in formset %}
                   {% comment %} {{ form.id}} {% endcomment %}
                     <tr>
-                      <td>{{forloop.counter }}</td>
+                      <td>{{form.id }}</td>
                       <td>{{form.student_name}}</td> 
                       <td>{{form.student_prn_no }}</td> 
-                      <td>{{form.attendance_status }}</td> 
+                      <td>{{form.is_present }}</td> 
                     </tr>
                   {% endfor %}
                 </tbody>
@@ -76,7 +76,7 @@
             <div class="modal fade" id="attendace_submit" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
-                  <div class="modal-header bg-success">
+                  <div class="modal-header " style="background:#02B4C3;">
                     <h4 class="modal-title text-white" id="exampleModalLongTitle">Submit Attendance Records</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
@@ -88,7 +88,7 @@
                   </div>
                   <div class="modal-footer">
                     <button  type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">No</button>
-                    <input type="submit" value="Yes" class="btn btn-success px-4"> &nbsp;
+                    <input type="submit" value="Yes" class="btn  px-4" style="background:#02B4C3;"> &nbsp;
                   </div>
                 </div>
               </div>

@@ -148,11 +148,12 @@ class DB_Schedule_Exam(models.Model):
     exam_end_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
 
 class DB_Attendance(models.Model):
+    id=models.AutoField(primary_key=True)
     academic_session=models.CharField(max_length=100, null=True)
     student_name=models.CharField(max_length=50,null=True)
     student_prn_no=models.CharField(max_length=50,null=True)
     student_class=models.CharField(max_length=50,null=True)
     attendance_date = models.DateField(null=True)
-    attendance_status = models.BooleanField(default=False)
+    is_present = models.BooleanField(default=False)
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
