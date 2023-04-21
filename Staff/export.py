@@ -9,7 +9,7 @@ import csv
 
 
 def export_pdf_due(request): 
-    template = get_template('export_pdf_due_records.html')
+    template = get_template('staff__export_pdf_due_records.html')
     due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0))
     Filter=DueFees_Filter(request.GET, queryset=due_records)
     rec2=Filter.qs 
@@ -36,7 +36,7 @@ def export_excel_deu():
     return responce
 
 def export_result_report_subject_wise(subject,prn):
-    template = get_template('export_pdf_result_subject_wise.html')
+    template = get_template('staff__export_pdf_result_subject_wise.html')
     result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn)
     profile_rec=CustomUser.objects.get(student_prn_no=prn)
     print()

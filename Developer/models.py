@@ -157,3 +157,13 @@ class DB_Attendance(models.Model):
     is_present = models.BooleanField(default=False)
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
+class DB_Web_Notification(models.Model):
+    academic_session=models.CharField(max_length=100, null=True)
+    student_class=models.CharField(max_length=100, null=True,choices=CLASS)
+    student_prn_no=models.CharField(max_length=50,null=True)
+    notification_subject=models.CharField(max_length=250,null=True)
+    notification_message=models.TextField(null=True)
+    upload_file1=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
+    upload_file2=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
+    upload_file3=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
+    notification_valid_up_to=models.DateField(auto_now=False, auto_now_add=False,null=True)

@@ -1,6 +1,6 @@
 
 from django.contrib.auth.forms import UserCreationForm
-from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance
+from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance,DB_Web_Notification
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.utils import timezone
@@ -139,4 +139,11 @@ class UpdateAttendanceForm(forms.ModelForm):
             'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
             'student_name': forms.TextInput(attrs={'class':'form-control'}),
             'is_present': forms.CheckboxInput(attrs={'class':'form-check-input'}),
+        }
+ 
+class Create_Web_Notification_Form(forms.ModelForm):
+    class Meta:
+        model = DB_Web_Notification
+        fields = '__all__'
+        widgets={ 
         }

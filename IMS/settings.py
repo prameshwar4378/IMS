@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'Developer',
     'Institute',
     'Staff',
+    'Student',
     'crispy_bootstrap5',
     'crispy_forms',
     'reportlab',

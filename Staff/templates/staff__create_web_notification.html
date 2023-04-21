@@ -1,0 +1,169 @@
+{% extends 'staff_base.html' %}
+{% load static %}
+{% block content %}
+{% load crispy_forms_tags %}
+<style>
+
+</style>
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Students Attendance</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Attendance </a></li>
+            </ol>
+        </nav>
+        {% comment %} <a href="{% url 'new_admission' %}" class="btn btn-primary text-light"
+            style="position: relative; left:70%; top:-50px;"><b> New Admission</b></a> {% endcomment %}
+
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+
+
+
+
+            <div class="row mt-4" id="attendance_table">
+                <div class="col-sm-12">
+                    <div style="padding:10px;  box-shadow:0px 0px 10px -4px; border-radius:8px;">
+                        <a href="" data-toggle="modal" data-target="#create_notification" class="btn btn-primary px-5">
+                            Create Filter</a>
+                        <hr>
+
+                        
+                <div class="row ">
+                    <div class="col-sm-4 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                            <div class="card-header text-dark" style="background:#A0D2FF;">
+                                <b> Total Notification </b>
+                            </div>
+                            <div class="card-header py-2">
+                                <h3 class="card-title" style="font-size:30px;"><b>{{collected_fees}}</b></h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                            <div class="card-header text-dark" style="background:#A0D2FF;">
+                                <b> Active Notification </b>
+                            </div>
+                            <div class="card-header py-2">
+                                <h3 class="card-title" style="font-size:30px;"><b>{{pending_dues}}</b></h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                            <div class="card-header text-dark" style="background:#A0D2FF;">
+                                <b> Inactive Notification </b>
+                            </div>
+                            <div class="card-header py-2">
+                                <h3 class="card-title" style="font-size:30px;"><b>{{total_pending}}</b></h3>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                        <br><br>
+                        {% if filter_total_attendance_rec %}
+                        <div style="overflow:scroll; width:100%;">
+                            <table id="example" class="table table-striped"
+                                style="overflow:scroll; width:100%;min-width: max-content;">
+                                <thead>
+                                    <tr style="background:#02B4C3;">
+                                        <th scope="col" class="text-center text-white" style="">Sr.No</th>
+                                        <th scope="col" class="text-center text-white" style="">Date</th>
+                                        <th scope="col" class="text-center text-white" style="">PRN No</th>
+                                        <th scope="col" class="text-center text-white" style="">Student Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Class</th>
+                                        <th scope="col" class="text-center text-white" style="">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in filter_total_attendance_rec %}
+                                    <tr>
+                                        <td>{{forloop.counter}}</td>
+                                        <td>{{i.attendance_date}}</td>
+                                        <td>{{i.student_prn_no}}</td>
+                                        <td>{{i.student_name}}</td>
+                                        <td>{{i.student_class}}</td>
+                                        {% if i.is_present  %}
+                                        <td style="text-align:center;"><span
+                                                style="background:green; border-radius:50px; color:white; padding:0 40px 0 40px;">Present</span>
+                                        </td>
+                                        {% else %}
+                                        <td style="text-align:center;"><span
+                                                style="background:red; border-radius:50px; color:white; padding:0 40px 0 40px;">Absent</span>
+                                        </td>
+                                        {% endif %}
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div><!-- End Left side columns -->
+    </section>
+
+</main><!-- End #main -->
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="create_notification" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document"  style="max-width:1000px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Create Notification</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="col-sm-4">
+                        {{form.student_class|as_crispy_field}}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable({
+            "paging": true,
+            "pageLength": 10,
+            "searching": true
+        });
+    });
+</script>
+
+{% endblock content %}

@@ -30,6 +30,7 @@ urlpatterns = [
     path('create_attendance/', Staff_view.create_attendance, name='create_attendance'), 
     path('update_attendance/', Staff_view.update_attendance, name='update_attendance'), 
     path('inactive_students_list/', Staff_view.inactive_students_list, name='inactive_students_list'), 
+    path('create_web_notification/', Staff_view.create_web_notification, name='create_web_notification'), 
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

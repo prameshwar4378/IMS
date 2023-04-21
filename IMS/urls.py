@@ -18,6 +18,7 @@ from django.urls import path,include
 from Developer import urls as Devloper_url
 from Staff import urls as Staff_url
 from Institute import urls as Institute_url
+from Student import urls as Student_url
 from Developer import views as Developer_views 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -32,4 +33,5 @@ urlpatterns = [
     path('Developer/',include(Devloper_url)),
     path('Institute/',include(Institute_url)),
     path('Staff/',include(Staff_url)),
+    path('Student/',include(Student_url)),
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

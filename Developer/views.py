@@ -23,6 +23,8 @@ def login(request):
                 return redirect('/Institute',{'user',user})
             elif user.is_staff==True:
                 return redirect('/Staff',{'user',user})
+            elif user.is_student==True:
+                return redirect('/Student',{'user',user})
         else:
             form=login_form()
             messages.error(request,'Opps...! User does not exist... Please try again..!')
