@@ -20,7 +20,6 @@ from datetime import date
 @login_required(login_url='/login/')
 def update_education_session(request):
     name=request.user.username
-    
     user = CustomUser.objects.get(username=name)
     user.save()
     fm=Form_academic_session()
@@ -40,22 +39,22 @@ def update_education_session(request):
 @login_required(login_url='/login/')
 def staff_dashboard(request):
     today = date.today()
-    student_records=CustomUser.objects.filter(is_student=True,date_time__date=today,academic_session=request.user.academic_session)
+    student_records=CustomUser.objects.filter(is_student=True,date_time__date=today,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     today_admission=student_records.count()
 
-    fees_records=DB_Fees.objects.filter(date_time__date=today,received_amount__isnull=False,academic_session=request.user.academic_session)
+    fees_records=DB_Fees.objects.filter(date_time__date=today,received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     total_fees=0
     for i in fees_records:
         total_fees+=int(i.received_amount)
 
-    total_present_students=DB_Attendance.objects.filter(date_time__date=today,is_present=True,academic_session=request.user.academic_session).count()
-    total_students=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session).count()
+    total_present_students=DB_Attendance.objects.filter(date_time__date=today,is_present=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
+    total_students=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
     if total_students > 0:
         present_student_in_percentage=(total_present_students/total_students)*100
     else:
         present_student_in_percentage=0
     
-    allocated_fees_DB=DB_Fees.objects.filter(add_fees__isnull=False,academic_session=request.user.academic_session)
+    allocated_fees_DB=DB_Fees.objects.filter(add_fees__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     total_allocated_fees=0
     for i in allocated_fees_DB:
         total_allocated_fees+=int(i.add_fees)
@@ -719,14 +718,65 @@ def inactive_students_list(request):
 @login_required(login_url='/login/')
 def create_web_notification(request):
     rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session)
-    form=Create_Web_Notification_Form()
+    today = date.today()
+
+    total=rec.count()
+    active=0
+    inactive=0
+    for i in rec:
+        if today < i.notification_valid_up_to:
+            active+=1
+        elif today > i.notification_valid_up_to:
+            inactive+=1
+        
+
+    form=Create_Web_Notification_Form() 
     if request.method=="POST":
-        form=Create_Web_Notification_Form(request.POST)
+        form=Create_Web_Notification_Form(request.POST, request.FILES) 
         if form.is_valid():
+            fm = form.save(commit=False)
+            fm.academic_session = request.user.academic_session
             form.save()
             messages.success(request,'Notification triggered Successfully')
             form=Create_Web_Notification_Form()
+            return redirect('/Staff/create_web_notification/')
     else:
         form=Create_Web_Notification_Form()
-    context={'form':form,'rec':rec}
+    context={'form':form,'rec':rec,'today':today,'active':active,'inactive':inactive,'total':total}
     return render(request,'staff__create_web_notification.html',context)
+
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def delete_web_notification(request,id):
+        pi=DB_Web_Notification.objects.get(pk=id)
+        pi.delete()
+        messages.success(request,'Notification Deleted Successfully!!!')
+        return redirect('/Staff/create_web_notification/')
+
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def update_web_notification(request,id):
+    if request.method=="POST":
+        pi=DB_Web_Notification.objects.get(pk=id)
+        fm=Create_Web_Notification_Form(request.POST,request.FILES, instance=pi)
+        if fm.is_valid():
+            fm.save()
+            messages.success(request,'Notification Updated Successfully')
+            return redirect('/Staff/create_web_notification/')
+    else:
+        pi=DB_Web_Notification.objects.get(pk=id)
+        fm=Create_Web_Notification_Form(instance=pi)
+    return render(request,'staff__update_web_notification.html',{'form':fm})
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def web_notification_details(request,id):
+    dt=get_object_or_404(DB_Web_Notification,id=id)
+    return render(request,"staff__web_notification_details.html",{'id':id,'data':dt})
+
+ 
