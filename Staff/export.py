@@ -10,7 +10,7 @@ import csv
 
 def export_pdf_due(request): 
     template = get_template('staff__export_pdf_due_records.html')
-    due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0))
+    due_records=DB_Fees.objects.exclude(Q(due_amount__isnull=True) | Q(due_amount=0)).filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     Filter=DueFees_Filter(request.GET, queryset=due_records)
     rec2=Filter.qs 
     total_value = rec2.aggregate(Sum('due_amount'))
@@ -26,22 +26,20 @@ def export_pdf_due(request):
     return HttpResponse('Error generating PDF file: %s' % pdf.err, status=400)
 
 
-def export_excel_deu():
+def export_excel_deu(request):
     responce=HttpResponse(content_type='text/csv')
     writer=csv.writer(responce)
     writer.writerow(['student_prn_no','student_name','student_class','received_date','payment_mode','received_amount','received_remark','due_date','due_amount','due_remark'])
-    for data in DB_Fees.objects.filter(due_amount__isnull=False).values_list('student_prn_no','student_name','student_class','received_date','payment_mode','received_amount','received_remark','due_date','due_amount','due_remark'):
+    for data in DB_Fees.objects.filter(due_amount__isnull=False).filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code).values_list('student_prn_no','student_name','student_class','received_date','payment_mode','received_amount','received_remark','due_date','due_amount','due_remark'):
        writer.writerow(data)    
     responce['Content-Disposition'] = 'attachment; filename="Student Due Records.csv"'
     return responce
 
-def export_result_report_subject_wise(subject,prn):
+def export_result_report_subject_wise(request,subject,prn):
     template = get_template('staff__export_pdf_result_subject_wise.html')
-    result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn)
-    profile_rec=CustomUser.objects.get(student_prn_no=prn)
-    print()
-    print(profile_rec.institute_name)
-    print(profile_rec.institute_logo)
+    result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    profile_rec=CustomUser.objects.get(student_prn_no=prn,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+
     institute_address=profile_rec.institute_address
     institute_name=profile_rec.institute_name
     institute_logo=profile_rec.institute_logo
@@ -69,7 +67,7 @@ def export_attendance(request):
     academic_session = "2022-2023"  # Replace with the actual academic session value
 
     # Get all attendance records for the academic session
-    attendance_records = DB_Attendance.objects.filter(academic_session=academic_session)
+    attendance_records = DB_Attendance.objects.filter(academic_session=academic_session,institute_code=request.user.institute_code)
 
     # Group attendance records by month
     attendance_by_month = {}

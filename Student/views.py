@@ -5,14 +5,36 @@ from Staff.filters import Attendance_Filter
 from django.db.models import Sum
 from django.db.models import Q
 from datetime import date
+from django.contrib import messages
+
+
+def update_academic_session(request):
+    name=request.user.username
+    user = CustomUser.objects.get(username=name)
+    user.save()
+    if request.method == 'POST':
+            academic_session = request.POST.get('cmb_update_academic_session')
+            user.academic_session = academic_session
+            user.save()
+            messages.success(request, 'Session Updated Success...!.')
+    return redirect('/Student/')
+
+
 # Create your views here.
 def student_dashboard(request):
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student')
+    # code for update session common for all function End
     PRN_NO=request.user.student_prn_no
     CLASS_NAME=request.user.student_class 
 
     dt=get_object_or_404(CustomUser,student_prn_no=PRN_NO)
- 
-    fees_rec = DB_Fees.objects.filter(student_prn_no=PRN_NO)
+   
+
+    fees_rec = DB_Fees.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
 
     total_fees=0
     paid_fees=0 
@@ -28,13 +50,13 @@ def student_dashboard(request):
     
 
     
-    exam_schedule_records=DB_Schedule_Exam.objects.filter(class_name=CLASS_NAME).last()
+    exam_schedule_records=DB_Schedule_Exam.objects.filter(class_name=CLASS_NAME,academic_session=request.user.academic_session,institute_code=request.user.institute_code).last()
     if exam_schedule_records:
         exam_name_for_result_chart = f"{exam_schedule_records.exam_title} ({exam_schedule_records.exam_start_date} To {exam_schedule_records.exam_end_date})"
     else:
         exam_name_for_result_chart=""
     if exam_schedule_records:
-        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title)
+        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     else:
         result_records=""
     label_subject_name_result=[]
@@ -47,7 +69,7 @@ def student_dashboard(request):
             label_subject_name_result.append(i.subject_name)
             data_marks_result.append(int(i.obtained_marks)) 
 
-    subject_marks_rec=DB_Result.objects.filter(student_prn_no=PRN_NO)
+    subject_marks_rec=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     label_subject_name_progress=[]
     data_marks_progress=[]
     total_out_of=[]
@@ -65,11 +87,7 @@ def student_dashboard(request):
     for i in range(len(data_marks_progress)):
         percentage = (float(data_marks_progress[i]) / float(total_out_of[i])) * 100
         average_marks.append(percentage)
-        
-    print(label_subject_name_progress)
-    print(data_marks_progress)
-    print(total_out_of)
-    print(average_marks)
+ 
 
     contaxt={'total_fees':total_fees,
              'paid_fees':paid_fees,
@@ -84,8 +102,14 @@ def student_dashboard(request):
     return render(request,'student__student_dashboard.html',contaxt)
 
 def attendance(request):
-    attendance_records=DB_Attendance.objects.filter(student_class=request.user.student_class,student_prn_no=request.user.student_prn_no,academic_session=request.user.academic_session) 
-    print(attendance_records) 
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student/attendance/')
+    # code for update session common for all function End
+        
+    attendance_records=DB_Attendance.objects.filter(student_class=request.user.student_class,student_prn_no=request.user.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code) 
 
     Filter=Attendance_Filter(request.GET, queryset=attendance_records)
     filtered_rec=Filter.qs
@@ -121,23 +145,41 @@ def attendance(request):
     return render(request,"student__student_attendance.html",context)
 
 def student_due(request):
-    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0,student_class=request.user.student_class,student_prn_no=request.user.student_prn_no, academic_session=request.user.academic_session)
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student/student_due/')
+    # code for update session common for all function End
+
+    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0,student_class=request.user.student_class,student_prn_no=request.user.student_prn_no, academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     total_value = due_records.aggregate(Sum('due_amount'))
     total_due_amount = str(total_value['due_amount__sum'])
     context={'rec':due_records,'total_due_amount':total_due_amount}
     return render(request,"student__due_list.html",context)
 
 def student_fees(request):
-    fees_rec=DB_Fees.objects.filter(student_class=request.user.student_class,student_prn_no=request.user.student_prn_no, academic_session=request.user.academic_session)
-    print(fees_rec.count())
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student/student__fees_dashboard/')
+    # code for update session common for all function End
+    fees_rec=DB_Fees.objects.filter(student_class=request.user.student_class,student_prn_no=request.user.student_prn_no, academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     context={'fees_rec':fees_rec}
     return render(request,"student__fees_dashboard.html",context)
 
 from Staff import export
 def result_dashboard(request):
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student/result_dashboard/')
+    # code for update session common for all function End
     PRN_NO=request.user.student_prn_no
-    result_record=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session)
-    exam_name = DB_Schedule_Exam.objects.filter(class_name=request.user.student_class,academic_session=request.user.academic_session).order_by('-id')
+    result_record=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    exam_name = DB_Schedule_Exam.objects.filter(class_name=request.user.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     if request.POST:
         report_type=request.POST.get('report_type')
@@ -153,7 +195,7 @@ def result_dashboard(request):
             st_name=request.user.student_name
             st_prn=PRN_NO
 
-            result_data = DB_Result.objects.filter(exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1,student_prn_no=PRN_NO)
+            result_data = DB_Result.objects.filter(exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1,student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
             
             if result_data:
                 student_class = result_data.first().student_class
@@ -223,26 +265,29 @@ def result_dashboard(request):
             else:
                 data_chart.append(int(i.obtained_marks))
 
-    subjects=DB_Subjects.objects.filter(class_name=request.user.student_class)
+    subjects=DB_Subjects.objects.filter(class_name=request.user.student_class,institute_code=request.user.institute_code)
 
     context={'result_record':result_record,'exam_record':exam_name,'subject_name':subjects,'labels':labels,'data':data_chart}
     return render(request,"student__result_dashboard.html",context)
 
 
 def notification_list(request):
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Student/notification_list/')
+    # code for update session common for all function End
     today = date.today()
 
     rec = DB_Web_Notification.objects.filter(
-        academic_session=request.user.academic_session
+        academic_session=request.user.academic_session,institute_code=request.user.institute_code
     ).filter(
         Q(student_prn_no=request.user.student_prn_no) | Q(student_prn_no=None),
         Q(student_class=request.user.student_class) | Q(student_class=None),
         Q(notification_valid_up_to__gte = today),
     ).order_by('-id')
     return render(request,'student__notification_list.html',{'rec':rec,'today':today})
-
-
-
 
 def web_notification_details(request,id):
     dt=get_object_or_404(DB_Web_Notification,id=id)

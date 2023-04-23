@@ -91,7 +91,7 @@ class Form_academic_session(forms.ModelForm):
 class Form_Subject(forms.ModelForm):
     class Meta:
         model=DB_Subjects
-        fields='__all__'
+        fields=('class_name','subject_name')
 
 
  
@@ -99,7 +99,7 @@ class Form_Subject(forms.ModelForm):
 class Form_Schedule_Exam(forms.ModelForm):
     class Meta:
         model=DB_Schedule_Exam
-        fields='__all__'
+        exclude=('institute_code',)
         widgets={
             'exam_start_date': forms.TextInput(attrs={'type': 'date'}),
             'exam_end_date': forms.TextInput(attrs={'type': 'date'}),
@@ -144,7 +144,7 @@ class UpdateAttendanceForm(forms.ModelForm):
 class Create_Web_Notification_Form(forms.ModelForm):
     class Meta:
         model = DB_Web_Notification
-        fields = '__all__'
+        exclude = ('institute_code',)
         widgets={ 
             'notification_message': forms.Textarea(attrs={'rows': 4}),
         }

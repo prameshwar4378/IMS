@@ -18,7 +18,7 @@ from datetime import date
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
-def update_education_session(request):
+def update_academic_session(request):
     name=request.user.username
     user = CustomUser.objects.get(username=name)
     user.save()
@@ -58,7 +58,7 @@ def staff_dashboard(request):
     total_allocated_fees=0
     for i in allocated_fees_DB:
         total_allocated_fees+=int(i.add_fees)
-    collected_fees_DB=DB_Fees.objects.filter(received_amount__isnull=False,academic_session=request.user.academic_session)
+    collected_fees_DB=DB_Fees.objects.filter(received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     total_collected_amount=0
     for i in collected_fees_DB:
         amount=i.received_amount
@@ -67,19 +67,19 @@ def staff_dashboard(request):
     label_expenses=['Allocated Fees','Collected Fees','Pending_fees']
     data_expenses=[total_allocated_fees,total_collected_amount,total_pending_fees]
 
-    student_data_male_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,student_gender="Male").count()
-    student_data_female_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,student_gender="Female").count()
+    student_data_male_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Male").count()
+    student_data_female_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Female").count()
     label_active_students=['Male','Female']
     data_active_students=[student_data_male_for_charts,student_data_female_for_charts]
 
-    exam_schedule_records=DB_Schedule_Exam.objects.filter().last()
+    exam_schedule_records=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code).last()
     if exam_schedule_records:
         exam_name_for_result_chart = f"{exam_schedule_records.exam_title} ({exam_schedule_records.exam_start_date} To {exam_schedule_records.exam_end_date})"
     else:
         exam_name_for_result_chart=""
 
     if exam_schedule_records:
-        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title)
+        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title,institute_code=request.user.institute_code,academic_session=request.user.academic_session)
     else:
         result_records=""
 
@@ -117,21 +117,22 @@ def staff_dashboard(request):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def student_fees_list(request):
-    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session)
+    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     return render(request,'staff__student_fees_list.html',{'rec':rec})
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def new_admission(request):
     session_student=request.user.academic_session
-    record=CustomUser.objects.filter(academic_session=session_student,is_student=True)
+    record=CustomUser.objects.filter(academic_session=session_student,is_student=True,institute_code=request.user.institute_code)
     if record.count()==0:
         student_count="1"
     else:
         student_count=str(record.count()+1)
     split_session1=session_student[-5:-3]
     split_session2=session_student[-2:]
-    prn_no=split_session1+split_session2+str("0")+str("0")+student_count
+    institute_code=request.user.institute_code
+    prn_no=institute_code+str('-')+split_session1+split_session2+str("0")+str("0")+student_count
 
     if request.method == 'POST':
         form = CustomStudentCreationForm(request.POST, request.FILES)
@@ -140,6 +141,7 @@ def new_admission(request):
             fm.institute_name = request.user.institute_name
             fm.institute_address = request.user.institute_address
             fm.institute_logo = request.user.institute_logo
+            fm.institute_code = request.user.institute_code
             form.save()
             messages.success(request, 'Registration Success...!.')
             form = CustomStudentCreationForm()
@@ -148,19 +150,7 @@ def new_admission(request):
         form = CustomStudentCreationForm()
     return render(request,'staff__admission_form.html', {'form': form,'academic_session':session_student,'auto_prn':prn_no})
 
-
-# Student dashboard
-# Add fees form
-
-@user_passes_test(lambda user: user.is_staff)
-@login_required(login_url='/login/')
-def student_panel(request):
-    active_students=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session).count()
-    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0, academic_session=request.user.academic_session).count()
-    context={'active_students':active_students,'due_records':due_records}
-    return render(request,'staff__student_panel.html',context)
-
-
+ 
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
@@ -180,16 +170,9 @@ def student_fees_dashboard(request,id):
         if i.due_amount != None:
             pending_dues += int(i.due_amount)
             print("Due Amount is",i.due_amount)
-        
-        # pending_fees=int(total_admission_fees)-int(total_collected_fees)
-    # else:
-    #     total_admission_fees=0
-    #     pending_fees=0
  
     total_pending=total_fees - collected_fees
     
-
-
     form_receive_fees = FormStudentReceivedFees()
     form_add_fees = FormAddFees()
 
@@ -197,6 +180,8 @@ def student_fees_dashboard(request,id):
         if 'received_amount' in request.POST:
             form_receive_fees = FormStudentReceivedFees(request.POST)
             if form_receive_fees.is_valid():
+                fm1 = form_receive_fees.save(commit=False)
+                fm1.institute_code = request.user.institute_code
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
                 form_receive_fees = FormStudentReceivedFees()
@@ -207,6 +192,7 @@ def student_fees_dashboard(request,id):
             if form_add_fees.is_valid():
                 fm = form_add_fees.save(commit=False)
                 fm.student_class = dt.student_class
+                fm.institute_code = request.user.institute_code
                 form_add_fees.save()
                 messages.success(request, 'Fees Added Successfully...!')
                 form_add_fees = FormAddFees()
@@ -279,7 +265,7 @@ def print_fees_receipt(request,id):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def due_list(request):
-    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0, academic_session=request.user.academic_session)
+    due_records=DB_Fees.objects.filter(due_amount__isnull=False, due_amount__gt=0, academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     Filter=DueFees_Filter(request.GET, queryset=due_records)
     rec2=Filter.qs 
     total_students=rec2.count()
@@ -294,19 +280,13 @@ def due_update(request,id):
     rec=DB_Fees.objects.get(pk=id)
     student_profile=CustomUser.objects.get(student_prn_no=rec.student_prn_no)
     student_id_for_dashboard=student_profile.id
- 
-
     if request.method=="POST":
         pi=DB_Fees.objects.get(pk=id)
         fm=FormStudentReceivedFees(request.POST,request.FILES, instance=pi)
-
-
         if fm.is_valid():
             fm.save()
             messages.success(request,'Fees Updated Successfully')
             return redirect(f'/Staff/student_fees_dashboard/{student_id_for_dashboard}')
-
-        # return redirect('/Admin_Home/admin_vehical_records/')
     else:
         pi=DB_Fees.objects.get(pk=id)
         fm=FormStudentReceivedFees(instance=pi)
@@ -322,17 +302,19 @@ def export_pdf_deu_records(request):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def export_excel_deu_records(request):
-    responce = export.export_excel_deu()
+    responce = export.export_excel_deu(request)
     return responce
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def manage_subjects(request):
-    rec=DB_Subjects.objects.all()
+    rec=DB_Subjects.objects.filter(institute_code=request.user.institute_code)
     form=Form_Subject()
     if request.method=="POST":
         form=Form_Subject(request.POST)
         if form.is_valid():
+            fm = form.save(commit=False)
+            fm.institute_code = request.user.institute_code
             form.save()
             messages.success(request,'Subject Added Successfully')
             form=Form_Subject()
@@ -355,7 +337,7 @@ def delete_subject(request,id):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def student_result_list(request):
-    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session)
+    rec=CustomUser.objects.filter(is_student=True,status="Active",academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     return render(request,'staff__student_result_list.html',{'rec':rec})
 
 
@@ -363,8 +345,8 @@ def student_result_list(request):
 @login_required(login_url='/login/')
 def student_result_dashboard(request,id):
     student_profile_record=CustomUser.objects.get(id=id)
-    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session)
-    exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class,academic_session=request.user.academic_session).order_by('-id')
+    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     # student_name=student_record.student_name
     if request.method == 'POST':
@@ -384,6 +366,7 @@ def student_result_dashboard(request,id):
 
             save_result = DB_Result(
                 academic_session=academic_session,
+                institute_code=request.user.institute_code,
                 student_prn_no=student_prn_no,
                 subject_name=subject_name,
                 student_class=student_class,
@@ -394,7 +377,7 @@ def student_result_dashboard(request,id):
                 result=result,
                 exam_title=exam_title,
                 exam_start_date=exam_start_date,
-                exam_end_date=exam_end_date
+                exam_end_date=exam_end_date,
             )
             save_result.save()
             messages.success(request,'Marks Added Successfully!!!')
@@ -406,6 +389,7 @@ def student_result_dashboard(request,id):
             # Select the record with the given ID and update its fields
             DB_Result.objects.filter(id=result_id).update(
                 academic_session=request.POST.get('txt_update_academic_session'),
+                institute_code=request.user.institute_code,
                 student_prn_no=request.POST.get('txt_update_student_prn_no'),
                 subject_name=request.POST.get('cmb_update_subject_name'),
                 min_marks=request.POST.get('txt_update_min_marks'),
@@ -415,7 +399,7 @@ def student_result_dashboard(request,id):
                 result=request.POST.get('txt_update_result'),
                 exam_title=update_exam_title,
                 exam_start_date=update_exam_start_date,
-                exam_end_date=update_exam_end_date
+                exam_end_date=update_exam_end_date 
             )
             messages.success(request, 'Marks Updated Successfully!!!')
         elif 'report_type' in request.POST:
@@ -423,7 +407,7 @@ def student_result_dashboard(request,id):
             if report_type == "Subject Wise":
                 subject_name_1=request.POST.get('select_subject_for_report')
                 student_prn_no=student_profile_record.student_prn_no
-                responce = export.export_result_report_subject_wise(subject_name_1,student_prn_no)
+                responce = export.export_result_report_subject_wise(request,subject_name_1,student_prn_no)
                 return responce
 
             elif report_type == "Exam Wise":
@@ -504,7 +488,7 @@ def student_result_dashboard(request,id):
                 data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
             else:
                 data_chart.append(int(i.obtained_marks))
-    subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class)
+    subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class,institute_code=request.user.institute_code)
     context={'subject_name':subjects,'st_data':student_profile_record,'result_record':result_record,'exam_record':exam_name,'labels':labels,'data':data_chart}
     return render(request,'staff__student_result_dashboard.html',context)
 
@@ -514,7 +498,6 @@ def student_result_dashboard(request,id):
 @login_required(login_url='/login/')
 def delete_result(request,id):
         pi=DB_Result.objects.get(pk=id)
-
         id_for_page_redirect=CustomUser.objects.get(student_prn_no=pi.student_prn_no).id
         pi.delete()
         messages.success(request,'Result Deleted Successfully!!!')
@@ -524,11 +507,13 @@ def delete_result(request,id):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def schedule_exam(request):
-    rec=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session)
+    rec=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     form=Form_Schedule_Exam()
     if request.method=="POST":
         form=Form_Schedule_Exam(request.POST)
         if form.is_valid():
+            fm = form.save(commit=False)
+            fm.institute_code = request.user.institute_code
             form.save()
             messages.success(request,'Exam Created Successfully')
             form=Form_Schedule_Exam()
@@ -556,7 +541,7 @@ def student_attendance_list(request):
     month_names = list(calendar.month_name)
     class_name=""
     attendancea_alredy_taken=""
-    attendance_records=DB_Attendance.objects.filter(academic_session=request.user.academic_session)
+    attendance_records=DB_Attendance.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     Filter=Attendance_Filter(request.GET, queryset=attendance_records)
     filtered_rec=Filter.qs
 
@@ -584,11 +569,11 @@ def student_attendance_list(request):
                 class_name=request.session.get('get_session_class')
                 for i in class_name:
                     class_name=i
-                student_record=CustomUser.objects.filter(is_student=True,student_class=class_name,academic_session=request.user.academic_session).count()
+                student_record=CustomUser.objects.filter(is_student=True,student_class=class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
                 if student_record > 0:
                     get_date=request.POST.get('txt_set_session_date')
                     get_class=request.POST.get('cmb_set_session_class_name')
-                    attedance_rec=DB_Attendance.objects.filter(attendance_date=get_date,student_class=get_class).count()
+                    attedance_rec=DB_Attendance.objects.filter(attendance_date=get_date,student_class=get_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
                     if attedance_rec > 0:
                         attendancea_alredy_taken="Attendance Alredy Taken"
                         return redirect('/Staff/update_attendance/')
@@ -640,7 +625,7 @@ def create_attendance(request):
     for i in session_class_name:
         session_class_name=i
 
-    student_record=CustomUser.objects.filter(is_student=True,student_class=session_class_name,academic_session=request.user.academic_session)
+    student_record=CustomUser.objects.filter(is_student=True,student_class=session_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     initial_data = [{'student_name': student.student_name, 'student_prn_no': student.student_prn_no} for student in student_record]
     MyFormSet = formset_factory(AttendanceForm, extra=0)
 
@@ -652,6 +637,7 @@ def create_attendance(request):
                 fm.student_class = session_class_name
                 fm.attendance_date = session_date
                 fm.academic_session = request.user.academic_session
+                fm.institute_code = request.user.institute_code
                 form.save()
             messages.success(request,'Attendance Submited Successfully!!!')
             return redirect('/Staff/student_attendance_list/')
@@ -671,7 +657,7 @@ def update_attendance(request):
     for i in session_class_name:
         session_class_name=i
 
-    student_record=DB_Attendance.objects.filter(student_class=session_class_name,attendance_date=session_date,academic_session=request.user.academic_session)
+    student_record=DB_Attendance.objects.filter(student_class=session_class_name,attendance_date=session_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     initial_data = [{'id': student.id, 'student_name': student.student_name, 'student_prn_no': student.student_prn_no,'is_present':student.is_present} for student in student_record]
     MyFormSet = formset_factory(UpdateAttendanceForm, extra=0)
  
@@ -698,7 +684,7 @@ import csv
 @login_required(login_url='/login/')
 def export_attendance(request,class_name,month_name):
         month_number = datetime.strptime(month_name, "%B").month # get the month number from the month name
-        attendance_data = DB_Attendance.objects.filter(attendance_date__month=month_number,student_class=class_name,academic_session=request.user.academic_session)
+        attendance_data = DB_Attendance.objects.filter(attendance_date__month=month_number,student_class=class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="attendance.csv"'
         writer = csv.writer(response)
@@ -711,13 +697,13 @@ def export_attendance(request,class_name,month_name):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def inactive_students_list(request):
-    rec=CustomUser.objects.filter(is_student=True,status="Inactive",academic_session=request.user.academic_session)
+    rec=CustomUser.objects.filter(is_student=True,status="Inactive",academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     return render(request,'staff__inactive_students_list.html',{'rec':rec})
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def create_web_notification(request):
-    rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session)
+    rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     today = date.today()
 
     total=rec.count()
@@ -736,6 +722,7 @@ def create_web_notification(request):
         if form.is_valid():
             fm = form.save(commit=False)
             fm.academic_session = request.user.academic_session
+            fm.institute_code = request.user.institute_code
             form.save()
             messages.success(request,'Notification triggered Successfully')
             form=Create_Web_Notification_Form()

@@ -58,7 +58,7 @@ class CustomUser(AbstractUser):
     # fields for Student 
     is_student=models.BooleanField(default=False)
     student_profile=models.ImageField( upload_to="student_profile/", null=True,blank=True)
-    student_prn_no=models.IntegerField(null=True,unique=True)
+    student_prn_no=models.CharField(max_length=50,null=True,unique=True)
     student_admission_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
     student_name=models.CharField(max_length=255,null=True)
     student_gender=models.CharField(max_length=255,null=True,choices=GENDER)
@@ -106,7 +106,7 @@ class DB_Fees(models.Model):
     student_username=models.CharField(max_length=250,null=True)
     operator_username=models.CharField(max_length=250,null=True) #this field used for checking Operator Name
     operator_name=models.CharField(max_length=250,null=True) #this field used for checking Operator Name
-    student_prn_no=models.IntegerField(null=True)
+    student_prn_no=models.CharField(max_length=50,null=True)
     student_name=models.CharField(max_length=250,null=True)
     student_class=models.CharField(max_length=50,choices=CLASS,null=True)
     received_date=models.DateField(auto_now=False, auto_now_add=True)
