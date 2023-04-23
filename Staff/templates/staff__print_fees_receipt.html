@@ -141,7 +141,7 @@
                         </div>
                         <div class="right">
                             <div class="description">
-                                {{data.pay_date}}
+                                {{data.received_date}}
                             </div>
                             <div class="description">
                                {{data.student_name}}
@@ -177,9 +177,18 @@
                     </div>
                     <div class="due_date" style="display:flex">
                         <div style="width:155px;solid gray;text-align:right;padding:5px">Due Date : </div>
+                        {% if data.due_date %}
                         <div style="width:220px;border-bottom:2px solid gray;padding:5px">{{data.due_date}}</div>
+                        {% else %}
+                        <div style="width:220px;border-bottom:2px solid gray;padding:5px">------</div>
+                        {% endif %}
                         <div style="width:150px;solid gray;padding:5px;text-align:right">Due Amount :</div>
+
+                        {% if data.due_amount %}
                         <div style="width:220px;border-bottom:2px solid gray;padding:5px">{{data.due_amount}}</div>
+                        {% else %}
+                        <div style="width:220px;border-bottom:2px solid gray;padding:5px">------</div>
+                        {% endif %}
                     </div>
                     <br>
                     <div class="footer" style="display:flex;border-top:2px solid black">
@@ -239,7 +248,7 @@
                         </div>
                         <div class="right">
                             <div class="description">
-                                {{data.pay_date}}
+                                {{data.received_date}}
                             </div>
                             <div class="description">
                                {{data.student_name}}
@@ -275,9 +284,18 @@
                     </div>
                     <div class="due_date" style="display:flex">
                         <div style="width:155px;solid gray;text-align:right;padding:5px">Due Date : </div>
+                        {% if data.due_date %}
                         <div style="width:220px;border-bottom:2px solid gray;padding:5px">{{data.due_date}}</div>
+                        {% else %}
+                        <div style="width:220px;border-bottom:2px solid gray;padding:5px">------</div>
+                        {% endif %}
                         <div style="width:150px;solid gray;padding:5px;text-align:right">Due Amount :</div>
+
+                        {% if data.due_amount %}
                         <div style="width:220px;border-bottom:2px solid gray;padding:5px">{{data.due_amount}}</div>
+                        {% else %}
+                        <div style="width:220px;border-bottom:2px solid gray;padding:5px">------</div>
+                        {% endif %}
                     </div>
                     <br>
                     <div class="footer" style="display:flex;border-top:2px solid black">

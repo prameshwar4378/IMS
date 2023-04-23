@@ -9,6 +9,8 @@ urlpatterns = [
     path('student_due/', Student_view.student_due,name="student__student_due"),    
     path('student__fees_dashboard/', Student_view.student_fees,name="student__fees_dashboard"),    
     path('result_dashboard/', Student_view.result_dashboard,name="student__result_dashboard"),     
+    path('notification_list/', Student_view.notification_list,name="student__notification_list"),      
+    path('web_notification_details/<int:id>', Student_view.web_notification_details,name="student__web_notification_details"),      
 ]
-if settings.DEBUG:
+if settings.DEBUG: 
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

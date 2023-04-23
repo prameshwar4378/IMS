@@ -146,4 +146,5 @@ class Create_Web_Notification_Form(forms.ModelForm):
         model = DB_Web_Notification
         fields = '__all__'
         widgets={ 
+            'notification_message': forms.Textarea(attrs={'rows': 4}),
         }

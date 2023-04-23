@@ -18,6 +18,7 @@ def add_staff(request):
             fm.institute_name = request.user.institute_name
             fm.institute_address = request.user.institute_address
             fm.institute_logo = request.user.institute_logo
+            fm.institute_code = request.user.institute_code
             fm.save()
             form = CustomStaffCreationForm()
             messages.success(request,'Staff Added Successfully...!')
@@ -27,25 +28,14 @@ def add_staff(request):
     return render(request,'add_staff.html', {'form': form})
 
 
-def add_session(request):
-    if request.method == 'POST':
-        form = CustomStaffCreationForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            form = CustomStaffCreationForm()
-            messages.success(request,'Staff Added Successfully...!')
-            return redirect('/Institute/add_staff/')
-    else:
-        form = CustomStaffCreationForm()
-    return render(request,'add_staff.html', {'form': form})
-
-
 def manage_session(request):
-    rec=DB_Session.objects.all()
+    rec=DB_Session.objects.filter(institute_code = request.user.institute_code)
     if request.method == 'POST':
         form = Form_Financial_Year_Session(request.POST)
         if form.is_valid():
-            form.save()
+            fm = form.save(commit=False) 
+            fm.institute_code = request.user.institute_code
+            fm.save()
             form = Form_Financial_Year_Session()
             messages.success(request,'Session Added Successfully...!')
             return redirect('/Institute/manage_session/')

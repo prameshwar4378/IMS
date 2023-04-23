@@ -47,6 +47,7 @@ class CustomUser(AbstractUser):
     institute_logo=models.ImageField( upload_to="institute_logo/", null=True,blank=True)
     institute_name = models.CharField(max_length=255,null=True)
     institute_address = models.CharField(max_length=500,null=True)
+    institute_code = models.CharField(max_length=500,null=True)
 
     # fields for Staff 
     is_staff=models.BooleanField(default=False)
@@ -100,6 +101,7 @@ class DB_Fees(models.Model):
     add_fees=models.DecimalField(max_digits=10, decimal_places=2,null=True)
     fees_remark=models.CharField(max_length=250,null=True)
     academic_session=models.CharField(max_length=100, null=True)
+    institute_code = models.CharField(max_length=500,null=True)
 
     student_username=models.CharField(max_length=250,null=True)
     operator_username=models.CharField(max_length=250,null=True) #this field used for checking Operator Name
@@ -124,10 +126,12 @@ class DB_Session(models.Model):
 class DB_Subjects(models.Model):
     class_name=models.CharField(max_length=50, null=True, choices=CLASS) 
     subject_name=models.CharField(max_length=100, null=True)
+    institute_code = models.CharField(max_length=500,null=True)
 
 
 class DB_Result(models.Model):
     academic_session=models.CharField(max_length=100, null=True)
+    institute_code = models.CharField(max_length=500,null=True)
     student_prn_no=models.CharField(max_length=100, null=True)
     subject_name=models.CharField(max_length=100, null=True)
     student_class=models.CharField(max_length=100, null=True)
@@ -142,6 +146,7 @@ class DB_Result(models.Model):
 
 class DB_Schedule_Exam(models.Model):
     academic_session=models.CharField(max_length=100, null=True)
+    institute_code = models.CharField(max_length=500,null=True)
     class_name=models.CharField(max_length=100, null=True,choices=CLASS)
     exam_title=models.CharField(max_length=100, null=True) 
     exam_start_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
@@ -150,6 +155,7 @@ class DB_Schedule_Exam(models.Model):
 class DB_Attendance(models.Model):
     id=models.AutoField(primary_key=True)
     academic_session=models.CharField(max_length=100, null=True)
+    institute_code = models.CharField(max_length=500,null=True)
     student_name=models.CharField(max_length=50,null=True)
     student_prn_no=models.CharField(max_length=50,null=True)
     student_class=models.CharField(max_length=50,null=True)
@@ -158,12 +164,14 @@ class DB_Attendance(models.Model):
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
 
 class DB_Web_Notification(models.Model):
-    academic_session=models.CharField(max_length=100, null=True)
-    student_class=models.CharField(max_length=100, null=True,choices=CLASS)
-    student_prn_no=models.CharField(max_length=50,null=True)
+    academic_session=models.CharField(max_length=100, null=True,blank=True)
+    institute_code = models.CharField(max_length=500,null=True)
+    student_class=models.CharField(max_length=100, null=True,blank=True,choices=CLASS)
+    student_prn_no=models.CharField(max_length=50,null=True,blank=True)
     notification_subject=models.CharField(max_length=250,null=True)
     notification_message=models.TextField(null=True)
     upload_file1=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
     upload_file2=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
     upload_file3=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
-    notification_valid_up_to=models.DateField(auto_now=False, auto_now_add=False,null=True)
+    notification_valid_up_to=models.DateField(auto_now=False, auto_now_add=False,null=True,blank=True)
+    date_time=models.DateField(auto_now=False, auto_now_add=True,null=True)

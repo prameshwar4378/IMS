@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import render,get_object_or_404,redirect
-from Developer.models import DB_Fees,DB_Attendance,DB_Result,DB_Schedule_Exam,CustomUser,DB_Subjects
+from Developer.models import DB_Fees,DB_Attendance,DB_Result,DB_Schedule_Exam,CustomUser,DB_Subjects,DB_Web_Notification
 from Staff.filters import Attendance_Filter
 from django.db.models import Sum
+from django.db.models import Q
+from datetime import date
 # Create your views here.
 def student_dashboard(request):
     PRN_NO=request.user.student_prn_no
@@ -72,6 +74,7 @@ def student_dashboard(request):
     contaxt={'total_fees':total_fees,
              'paid_fees':paid_fees,
              'pending_fees':pending_fees,
+             'pending_dues':pending_dues,
              'exam_name_for_result_chart':exam_name_for_result_chart,
              'label_subject_name_result':label_subject_name_result,
              'data_marks_result':data_marks_result,
@@ -224,3 +227,23 @@ def result_dashboard(request):
 
     context={'result_record':result_record,'exam_record':exam_name,'subject_name':subjects,'labels':labels,'data':data_chart}
     return render(request,"student__result_dashboard.html",context)
+
+
+def notification_list(request):
+    today = date.today()
+
+    rec = DB_Web_Notification.objects.filter(
+        academic_session=request.user.academic_session
+    ).filter(
+        Q(student_prn_no=request.user.student_prn_no) | Q(student_prn_no=None),
+        Q(student_class=request.user.student_class) | Q(student_class=None),
+        Q(notification_valid_up_to__gte = today),
+    ).order_by('-id')
+    return render(request,'student__notification_list.html',{'rec':rec,'today':today})
+
+
+
+
+def web_notification_details(request,id):
+    dt=get_object_or_404(DB_Web_Notification,id=id)
+    return render(request,"student__web_notification_details.html",{'id':id,'data':dt})

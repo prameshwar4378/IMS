@@ -128,7 +128,11 @@
           <li class="nav-item dropdown pe-3 text-center  ">
 
               <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                  <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle">
+                {% if request.user.staff_profile %}
+                <img src="/media/{{request.user.staff_profile}}" alt="Profile" class="rounded-circle">
+                {% else %}
+                <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle">
+                {% endif %}
                   <span class="d-none d-md-block dropdown-toggle ps-2">{{user.staff_name}}</span>
               </a><!-- End Profile Iamge Icon -->
 
