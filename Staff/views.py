@@ -364,23 +364,26 @@ def student_result_dashboard(request,id):
             exam_data = request.POST.get('cmb_exam_name')
             exam_title, exam_start_date, exam_end_date = exam_data.split(" | ")
 
-            save_result = DB_Result(
-                academic_session=academic_session,
-                institute_code=request.user.institute_code,
-                student_prn_no=student_prn_no,
-                subject_name=subject_name,
-                student_class=student_class,
-                min_marks=min_marks,
-                obtained_marks=obtained_marks,
-                out_off_marks=out_off_marks,
-                percentage=percentage,
-                result=result,
-                exam_title=exam_title,
-                exam_start_date=exam_start_date,
-                exam_end_date=exam_end_date,
-            )
-            save_result.save()
-            messages.success(request,'Marks Added Successfully!!!')
+            if DB_Result.objects.filter(academic_session=academic_session,student_prn_no=student_prn_no,institute_code=request.user.institute_code,subject_name=subject_name,exam_title=exam_title, exam_start_date=exam_start_date, exam_end_date=exam_end_date).exists():
+                messages.error(request,'Record alredy exist You can update the Reocord !!!')
+            else:
+                save_result = DB_Result(
+                    academic_session=academic_session,
+                    institute_code=request.user.institute_code,
+                    student_prn_no=student_prn_no,
+                    subject_name=subject_name,
+                    student_class=student_class,
+                    min_marks=min_marks,
+                    obtained_marks=obtained_marks,
+                    out_off_marks=out_off_marks,
+                    percentage=percentage,
+                    result=result,
+                    exam_title=exam_title,
+                    exam_start_date=exam_start_date,
+                    exam_end_date=exam_end_date,
+                )
+                save_result.save()
+                messages.success(request,'Marks Added Successfully!!!')
         elif 'txt_update_result_id' in request.POST: 
             result_id = request.POST.get('txt_update_result_id')
             update_exam_data = request.POST.get('cmb_update_exam_name')

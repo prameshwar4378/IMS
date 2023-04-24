@@ -109,9 +109,13 @@
                                             <a href=" " data-toggle="modal" data-target="#update_result"
                                                 onclick="update_result('{{r.id}}','{{r.subject_name}}','{{r.min_marks}}','{{r.obtained_marks}}','{{r.out_off_marks}}','{{r.percentage}}','{{r.result}}')"><i
                                                     class="bi bi-pencil-square px-2" style="font-size:20px"></i></a>
-                                            <a href=" {% url 'delete_result' r.id %}"><i
+                                            {% comment %} <a href=" {% url 'delete_result' r.id %}"><i
                                                     class="bi bi-trash-fill px-2 text-danger"
-                                                    style="font-size:20px"></i></a>
+                                                    style="font-size:20px"></i></a> {% endcomment %}
+                                                    <i onclick="delete_records('{{r.id}}')"
+                                                        class="bi bi-trash-fill px-2 text-danger"
+                                                        style="font-size:20px;cursor:pointer;" ></i> 
+                                                    
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -474,5 +478,7 @@
         });
     });
 </script>
+
+
 
 {% endblock content %}

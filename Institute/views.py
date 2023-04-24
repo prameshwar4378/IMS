@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
 from .forms import CustomStaffCreationForm,Form_Financial_Year_Session
 from django.contrib import messages
-from Developer.models import DB_Session
+from Developer.models import DB_Session,CustomUser
 # Create your views here.
 
 def home(request):
     return render(request,'institute_dashboard.html')
 
 def staff_list(request):
-    return render(request,'staff_list.html')
+    rec=CustomUser.objects.filter(is_staff=True, institute_code=request.user.institute_code,is_superuser=False)
+    return render(request,'staff_list.html',{'rec':rec})
 
 def add_staff(request):
     if request.method == 'POST':
@@ -29,13 +30,11 @@ def add_staff(request):
 
 
 def manage_session(request):
-    rec=DB_Session.objects.filter(institute_code = request.user.institute_code)
+    rec=DB_Session.objects.filter()
     if request.method == 'POST':
         form = Form_Financial_Year_Session(request.POST)
         if form.is_valid():
-            fm = form.save(commit=False) 
-            fm.institute_code = request.user.institute_code
-            fm.save()
+            form.save()
             form = Form_Financial_Year_Session()
             messages.success(request,'Session Added Successfully...!')
             return redirect('/Institute/manage_session/')

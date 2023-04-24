@@ -320,15 +320,24 @@
 </script> 
 
 
-
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     {% for msg in messages %}
-    swal("Done", "{{msg}}", "success");
-  {% endfor %}
-  </script>
-
-
-
+        {% if msg.tags == 'success' %}
+        swal({
+          title: "Good job!",
+          text: "{{msg}}",
+          icon: "success",
+          button: "OK",
+        });
+        {% else %}
+        swal({
+          text: "{{msg}}",
+          icon: "error",
+        })
+        {% endif %}
+    {% endfor %}
+</script>
+ 
 
 </html>
