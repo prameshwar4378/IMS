@@ -21,9 +21,17 @@
             <div class="col-lg-12">
                 <div class="row">
                     <div class="container" style="max-width:90%;">
-                         <form method="POST" enctype="multipart/form-data">
+                        <form method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
-                            {{form|crispy}}
+                            {{form.username|as_crispy_field}}
+                            {{form.staff_name|as_crispy_field}}
+                            {{form.email|as_crispy_field}}
+                            {{form.staff_profile|as_crispy_field}}
+                            {{form.staff_id_no|as_crispy_field}}
+                            <span style="display:none;">{{form.is_staff|as_crispy_field}}</span>
+                            {{form.status|as_crispy_field}}
+                            {{form.password1|as_crispy_field}}
+                            {{form.password2|as_crispy_field}}
                            <center> <input type="submit" value="Submit" class="btn btn-primary text-light px-5 px-3"></center>
                          </form>
                     </div>

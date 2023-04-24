@@ -113,7 +113,7 @@
   </div><!-- End Logo -->
 
   <div class="px-4" >
-     <a href="{% url 'update_academic_session' %}" style="text-decoration:none;color:rgb(3, 119, 202);"> session : {{user.academic_session}} <i class="bi bi-caret-down-square" ></i></a>
+     <a href="" style="text-decoration:none;color:rgb(3, 119, 202);"  data-toggle="modal" data-target="#update_academic_session"> session : {{user.academic_session}} <i class="bi bi-caret-down-square" ></i></a>
   </div><!-- End Search Bar -->
 
 
@@ -165,12 +165,20 @@
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
-      <li class="nav-item">
+      {% comment %} <li class="nav-item">
           <a class="nav-link " href="">
               <i class="bi bi-grid"></i>
               <span>DASHBOARD</span>
           </a>
-      </li><!-- End Dashboard Nav -->
+      </li>  {% endcomment %}
+
+      
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'add_staff' %}">
+          <i class="bi bi-card-list"></i>
+            <span>Add New Staff</span>
+        </a>
+      </li>
 
       <li class="nav-item">
         <a class="nav-link " href="{% url 'staff_list' %}">
@@ -179,12 +187,12 @@
         </a>
       </li>
 
-      <li class="nav-item">
-        <a class="nav-link " href="{% url 'manage_session' %}">
-          <i class="bi bi-card-list"></i>
-            <span>Manage Session</span>
-        </a>
-      </li>
+        {% comment %} <li class="nav-item">
+          <a class="nav-link " href="{% url 'manage_session' %}">
+            <i class="bi bi-card-list"></i>
+              <span>Manage Session</span>
+          </a>
+        </li> {% endcomment %}
       
   </ul>
 </aside><!--  End Sidebar-->
@@ -216,6 +224,38 @@
 
   {% block content %}{% endblock content %}
 
+
+<!-- Modal -->
+<div class="modal fade" id="update_academic_session" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h4 class="modal-title text-white" id="exampleModalLongTitle">Update Academic Session</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-left">
+        <form action="" method="post">
+          {% csrf_token %}
+          <select name="cmb_update_academic_session" id="cmb_academic_session" class="form-control">
+            <option value="">-----</option>
+            <option value="2022-23">2022-23</option>
+            <option value="2023-24">2023-24</option>
+            <option value="2024-25">2024-25</option>
+            <option value="2025-26">2025-26</option>
+          </select>
+
+       
+      </div>
+      <div class="modal-footer">
+        <input type="submit" value="Update" class="btn btn-primary"> &nbsp;
+      </form>
+        <button  type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -269,11 +309,22 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     {% for msg in messages %}
-    swal("Done", "{{msg}}", "success");
-  {% endfor %}
-  </script>
-
-
+        {% if msg.tags == 'success' %}
+        swal({
+          title: "Good job!",
+          text: "{{msg}}",
+          icon: "success",
+          button: "OK",
+        });
+        {% else %}
+        swal({
+          text: "{{msg}}",
+          icon: "error",
+        })
+        {% endif %}
+    {% endfor %}
+</script>
+ 
 
 
 </html>

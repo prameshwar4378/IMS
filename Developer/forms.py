@@ -4,6 +4,14 @@ from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 
 class Custom_Institute_Creation_Form(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget = forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Password'})
+        self.fields['password2'].widget = forms.PasswordInput(attrs={'autocomplete': 'new-password', 'placeholder': 'Confirm Password'})
+        self.fields['password1'].help_text = None
+        self.fields['password2'].help_text = None
+        
+    is_institute = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), initial=True)
     class Meta:
         model = CustomUser
         fields = ('username','email', 'institute_name','institute_address','institute_code','institute_logo','is_institute','password1','password2')

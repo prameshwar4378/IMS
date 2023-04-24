@@ -106,12 +106,14 @@
                         student copy 
                     </div>
                     <div class="header">
-                        <div class="logo"><img src="{% static 'img/developer_logo.png' %}" alt="" style="width:120px">
-                        </div>
+                        {% if institute_details.institute_logo %}
+                        <div class="logo"><img src="/media/{{institute_details.institute_logo}}" alt="" style="width:120px"></div>
+                        {% else %}
+                        <div class="logo"><img src="{% static 'img/developer_logo.png' %}" alt="" style="width:120px"></div>
+                        {% endif %}
                         <div class="institute_title" style="text-align:center;padding-top:5px">
-                            <span style="font-size:17px;font-weight:bold">DEOGIRI COLLAGE, SAMBHAJINGARDEOGIRI
-                                COLLAGE, SAMBHAJINGAR</span><br>
-                            <span>this is paragraph for address and contact realated information,423601</span>
+                            <span style="font-size:17px;font-weight:bold">{{institute_details.institute_name}}</span><br>
+                            <span>{{institute_details.institute_address}}</span>
                         </div>
                     </div>
                     <div style="padding:5px;padding-top:10px">
@@ -213,12 +215,14 @@
                         office copy
                     </div>
                     <div class="header">
-                        <div class="logo"><img src="{% static 'img/developer_logo.png' %}" alt="" style="width:120px">
-                        </div>
+                        {% if institute_details.institute_logo %}
+                        <div class="logo"><img src="/media/{{institute_details.institute_logo}}" alt="" style="width:120px"></div>
+                        {% else %}
+                        <div class="logo"><img src="{% static 'img/developer_logo.png' %}" alt="" style="width:120px"></div>
+                        {% endif %}
                         <div class="institute_title" style="text-align:center;padding-top:5px">
-                            <span style="font-size:17px;font-weight:bold">DEOGIRI COLLAGE, SAMBHAJINGARDEOGIRI
-                                COLLAGE, SAMBHAJINGAR</span><br>
-                            <span>this is paragraph for address and contact realated information,423601</span>
+                            <span style="font-size:17px;font-weight:bold">{{institute_details.institute_name}} </span><br>
+                            <span>{{institute_details.institute_address}}</span>
                         </div>
                     </div>
                     <div style="padding:5px;padding-top:10px">

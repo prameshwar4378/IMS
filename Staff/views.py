@@ -197,6 +197,17 @@ def student_fees_dashboard(request,id):
                 messages.success(request, 'Fees Added Successfully...!')
                 form_add_fees = FormAddFees()
                 return redirect(f'/Staff/student_fees_dashboard/{id}')
+          
+        elif 'txt_update_allocated_fees' in request.POST:
+                allocated_id = request.POST.get('txt_update_allocated_id')
+                allocated_fees = request.POST.get('txt_update_allocated_fees')
+                allocated_fees_remark = request.POST.get('txt_update_allocated_fees_remark')
+                print(allocated_id)
+                print(allocated_fees)
+                print(allocated_fees_remark)
+                DB_Fees.objects.filter(id=allocated_id).update(add_fees=allocated_fees, fees_remark=allocated_fees_remark)
+                messages.success(request, 'Fees Updated Successfully...!')
+                return redirect(f'/Staff/student_fees_dashboard/{id}')
   
     else:
         form_receive_fees = FormStudentReceivedFees()
@@ -259,7 +270,8 @@ def print_admission_form(request,id):
  
 def print_fees_receipt(request,id):
     dt=get_object_or_404(DB_Fees,id=id)
-    return render(request,"staff__print_fees_receipt.html",{'data':dt})
+    institute_details=get_object_or_404(CustomUser,student_prn_no=dt.student_prn_no)
+    return render(request,"staff__print_fees_receipt.html",{'data':dt,'institute_details':institute_details})
 
 
 @user_passes_test(lambda user: user.is_staff)

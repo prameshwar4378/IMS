@@ -11,10 +11,15 @@
                 <li class="breadcrumb-item"><a href="#">Home</a></li>
                 <li class="breadcrumb-item"><a href="#">Staff </a></li>
             </ol>
-        </nav>
-        <a href="{% url 'add_staff' %}" class="btn btn-primary text-light"
-            style="position: relative; left:70%; top:-50px;">Add Staff</a>
-
+        </nav> 
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <strong>Note :</strong> Currently, all rights have been allocated to staff profile. We kindly request that you create a staff profile and login to efficiently manage your business.
+            <button type="button" class="btn-close" 
+              data-bs-dismiss="alert"
+              aria-label="Close">
+            </button>
+        </div>
+        <br>
     </div><!-- End Page Title -->
 
     <section class="section dashboard">
@@ -34,6 +39,7 @@
                                         <th scope="col" class="text-center text-white" style="">Name</th>
                                         <th scope="col" class="text-center text-white" style="">Profile</th>
                                         <th scope="col" class="text-center text-white" style="">institue code</th>
+                                        <th scope="col" class="text-center text-white" style="">Active Status</th>
                                         <th scope="col" class="text-center text-white" style="">Action</th>
                                 </tr>
                             </thead>
@@ -55,8 +61,17 @@
                                     </td> 
                                     <td>{{request.user.institute_code}}</td> 
                                     <td>
+                                        {% if r.status == "Active" %}
+                                          <center> <span style="background:green; padding:5px 20px 5px 20px; border-radius:20px; color:white;">Active</span></center> 
+                                        {% else %}
+                                        <center>   <span style="background:gray; padding:5px 20px 5px 20px; border-radius:20px;  color:white;">Inactive</span></center> 
+
+                                        {% endif %}
+                                    </td> 
+                                    <td>
                                         <center>
-                                            <a href="{% url 'due_update' r.id %}" class="btn btn-warning px-3">Edit</a> 
+                                            <a href="{% url 'update_staff' r.id %}" class="btn btn-warning px-3">Edit</a> 
+                                            <a href="{% url 'delete_staff' r.id %}" class="btn btn-danger px-3">Delete</a> 
                                         </center>
 
                                     </td>

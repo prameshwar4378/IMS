@@ -5,14 +5,19 @@ from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.core.validators import RegexValidator
 
+STATUS=(("Active","Active"),("Inactive","Inactive"))
 
 class CustomStaffCreationForm(UserCreationForm):
+    is_staff = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), initial=True)
+    status = forms.ChoiceField(choices=STATUS, initial='Active')
     class Meta:
         model = CustomUser
-        fields = ('username','staff_profile','staff_name','email','staff_id_no','is_staff','password1','password2')
-
-
-
+        fields = ('username','staff_profile','staff_name','email','staff_id_no','is_staff','status','password1','password2')
+        widgets = { 
+            'is_staff':forms.HiddenInput(),
+        }
+   
+ 
 class Form_Financial_Year_Session(forms.ModelForm):
     financial_year = forms.CharField(
         max_length=7,

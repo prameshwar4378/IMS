@@ -178,8 +178,7 @@
                                 <td>{{r.add_fees}}</td>
                                 <td>{{r.fees_remark}}</td>
                                 <td> 
-                                    <a href=" "><i class="bi bi-pencil-square px-2"
-                                            style="font-size:20px"></i></a>
+                                    <a href=" " data-toggle="modal" data-target="#update_allocated_fees" onclick="update_allocated_fees('{{r.id}}','{{r.add_fees}}','{{r.fees_remark}}')"><i class="bi bi-pencil-square px-2" style="font-size:20px"></i></a>
                                     <a href="{% url 'delete_fees_record' r.id %}"><i
                                             class="bi bi-trash-fill px-2 text-danger" style="font-size:20px"></i></a>
                                 </td>
@@ -245,7 +244,7 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Add Fees</h5>
+                            <h5 class="modal-title" id="exampleModalLongTitle">Allocate Fees</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -274,6 +273,49 @@
 
 </main><!-- End #main -->
 
+
+
+<!-- Modal -->
+<div class="modal fade" id="update_allocated_fees" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Update Allocated Fees</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="POST">
+                    {% csrf_token %}
+                                
+                        <input type="hidden" name="txt_update_allocated_id" id="txt_update_allocated_id" class="form-control">
+                        <span>
+                        <label for="txt_update_allocated_fees" class="form-label requiredField mt-3">Amount</label>
+                        <input type="text" name="txt_update_allocated_fees" id="txt_update_allocated_fees" class="form-control">
+                    </span>
+                                                
+                    <span>
+                        <label for="txt_update_allocated_fees_remark" class="form-label requiredField mt-3">Remark</label>
+                        <input type="text" name="txt_update_allocated_fees_remark" id="txt_update_allocated_fees_remark" class="form-control">
+                    </span>
+                        
+                <span>
+                    <center>
+                        <input type="submit" class="btn btn-primary mt-3 px-4" value="Update Fees">
+                    </center>
+                </span>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 
@@ -306,7 +348,11 @@
     document.querySelector('#first-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
     document.querySelector('#second-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
 
-
+    function update_allocated_fees(id,allocated_fees,fees_remark){
+        document.getElementById('txt_update_allocated_id').value = id;
+        document.getElementById('txt_update_allocated_fees').value = allocated_fees;
+        document.getElementById('txt_update_allocated_fees_remark').value = fees_remark;
+    }
 
 </script>
 

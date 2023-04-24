@@ -1,3 +1,0 @@
-# IMS
-
-Adding readme file
