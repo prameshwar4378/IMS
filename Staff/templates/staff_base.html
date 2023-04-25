@@ -319,6 +319,7 @@
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
 </script> 
 
+ 
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
@@ -330,14 +331,33 @@
           icon: "success",
           button: "OK",
         });
-        {% else %}
+
+        {% elif msg.tags == 'error' %}
         swal({
+          title: "Error",
           text: "{{msg}}",
           icon: "error",
-        })
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'warning' %}
+        swal({
+          title: "Warning",
+          text: "{{msg}}",
+          icon: "warning",
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'info' %}
+        swal({
+          title: "Oops",
+          text: "{{msg}}",
+          icon: "info",
+          button: "OK",
+        });
+         
         {% endif %}
     {% endfor %}
 </script>
  
-
 </html>

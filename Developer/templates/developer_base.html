@@ -260,6 +260,7 @@
 </script> 
 
 
+
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     {% for msg in messages %}
@@ -270,11 +271,30 @@
           icon: "success",
           button: "OK",
         });
-        {% else %}
+
+        {% elif msg.tags == 'error' %}
         swal({
+          title: "Error",
           text: "{{msg}}",
           icon: "error",
-        })
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'warning' %}
+        swal({
+          title: "Warning",
+          text: "{{msg}}",
+          icon: "warning",
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'info' %}
+        swal({
+          text: "{{msg}}",
+          icon: "info",
+          button: "OK",
+        });
+         
         {% endif %}
     {% endfor %}
 </script>

@@ -165,12 +165,12 @@
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
-      {% comment %} <li class="nav-item">
-          <a class="nav-link " href="">
+    <li class="nav-item">
+          <a class="nav-link " href="{% url 'institute_dashboard' %}">
               <i class="bi bi-grid"></i>
               <span>DASHBOARD</span>
           </a>
-      </li>  {% endcomment %}
+      </li>
 
       
       <li class="nav-item">
@@ -316,11 +316,31 @@
           icon: "success",
           button: "OK",
         });
-        {% else %}
+
+        {% elif msg.tags == 'error' %}
         swal({
+          title: "Error",
           text: "{{msg}}",
           icon: "error",
-        })
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'warning' %}
+        swal({
+          title: "Warning",
+          text: "{{msg}}",
+          icon: "warning",
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'info' %}
+        swal({
+          title: "Oops",
+          text: "{{msg}}",
+          icon: "info",
+          button: "OK",
+        });
+         
         {% endif %}
     {% endfor %}
 </script>

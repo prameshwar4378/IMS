@@ -48,6 +48,7 @@ class CustomUser(AbstractUser):
     institute_name = models.CharField(max_length=255,null=True)
     institute_address = models.CharField(max_length=500,null=True)
     institute_code = models.CharField(max_length=500,null=True)
+    institute_is_completed=models.BooleanField(default=False)
 
     # fields for Staff 
     is_staff=models.BooleanField(default=False)
@@ -82,6 +83,7 @@ class CustomUser(AbstractUser):
     group=models.CharField(max_length=255,null=True,blank=True)
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
+    tour_is_completed=models.BooleanField(default=False)
 
 
 

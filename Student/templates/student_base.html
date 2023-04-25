@@ -328,14 +328,46 @@
 
 
 
+
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
     {% for msg in messages %}
-    swal("Done", "{{msg}}", "success");
-  {% endfor %}
-  </script>
+        {% if msg.tags == 'success' %}
+        swal({
+          title: "Good job!",
+          text: "{{msg}}",
+          icon: "success",
+          button: "OK",
+        });
 
-
+        {% elif msg.tags == 'error' %}
+        swal({
+          title: "Error",
+          text: "{{msg}}",
+          icon: "error",
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'warning' %}
+        swal({
+          title: "Warning",
+          text: "{{msg}}",
+          icon: "warning",
+          button: "OK",
+        });
+         
+        {% elif msg.tags == 'info' %}
+        swal({
+          title: "Oops",
+          text: "{{msg}}",
+          icon: "info",
+          button: "OK",
+        });
+         
+        {% endif %}
+    {% endfor %}
+</script>
+ 
 
 
 </html>

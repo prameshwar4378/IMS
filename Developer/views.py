@@ -31,7 +31,7 @@ def login(request):
                     return redirect('/Student',{'user',user})
             else:
                 lg_form=login_form()
-                messages.error(request,'Opps...! User does not exist... Please try again..!')
+                messages.warning(request,'Opps...! User does not exist... Please try again..!')
 
 
         if 'txt_sign_up_username' in request.POST:  
@@ -40,7 +40,7 @@ def login(request):
             password = request.POST.get('txt_sign_up_password', False)
             
             if CustomUser.objects.filter(username=username).exists():
-                messages.error(request,'Username already exists!')
+                messages.info(request,'Username already exists!')
             else:
                 create_user = CustomUser(
                     username=username,

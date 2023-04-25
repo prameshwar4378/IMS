@@ -143,7 +143,7 @@ def new_admission(request):
             fm.institute_logo = request.user.institute_logo
             fm.institute_code = request.user.institute_code
             form.save()
-            messages.success(request, 'Registration Success...!.')
+            messages.success(request, 'Registration Successfully...!.')
             form = CustomStudentCreationForm()
             return redirect('/Staff/new_admission/')
     else:
@@ -377,7 +377,7 @@ def student_result_dashboard(request,id):
             exam_title, exam_start_date, exam_end_date = exam_data.split(" | ")
 
             if DB_Result.objects.filter(academic_session=academic_session,student_prn_no=student_prn_no,institute_code=request.user.institute_code,subject_name=subject_name,exam_title=exam_title, exam_start_date=exam_start_date, exam_end_date=exam_end_date).exists():
-                messages.error(request,'Record alredy exist You can update the Reocord !!!')
+                messages.info(request,'Record alredy exist You can update the Reocord !!!')
             else:
                 save_result = DB_Result(
                     academic_session=academic_session,
@@ -687,7 +687,7 @@ def update_attendance(request):
             messages.success(request, 'Attendance updated successfully!')
             return redirect('/Staff/student_attendance_list/')
         else:
-            messages.success(request,'Form not valid!!!')
+            messages.error(request,'Form not valid!!!')
     else: 
         formset = MyFormSet(initial=initial_data)
     return render(request, "staff__update_attendance.html",{'formset':formset,'date':session_date,'class_name':session_class_name,'student_record':student_record})
