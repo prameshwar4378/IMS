@@ -8,9 +8,15 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 
+def is_student(user):
+    return user.is_authenticated and hasattr(user, 'is_student') and user.is_student
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+def student_required(view_func):
+    decorated_view_func = login_required(user_passes_test(is_student, login_url='/accounts/login/')(view_func))
+    return decorated_view_func
+
+
+@student_required
 def update_academic_session(request):
     name=request.user.username
     user = CustomUser.objects.get(username=name)
@@ -24,8 +30,7 @@ def update_academic_session(request):
 
 
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def student_dashboard(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -106,8 +111,7 @@ def student_dashboard(request):
              }    
     return render(request,'student__student_dashboard.html',contaxt)
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def attendance(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -151,8 +155,7 @@ def attendance(request):
     }
     return render(request,"student__student_attendance.html",context)
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def student_due(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -167,8 +170,7 @@ def student_due(request):
     context={'rec':due_records,'total_due_amount':total_due_amount}
     return render(request,"student__due_list.html",context)
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def student_fees(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -181,8 +183,7 @@ def student_fees(request):
     return render(request,"student__fees_dashboard.html",context)
 
 from Staff import export
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def result_dashboard(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -284,8 +285,7 @@ def result_dashboard(request):
     return render(request,"student__result_dashboard.html",context)
 
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def notification_list(request):
     # code for update session common for all function start
     if request.method=="POST":
@@ -304,8 +304,7 @@ def notification_list(request):
     ).order_by('-id')
     return render(request,'student__notification_list.html',{'rec':rec,'today':today})
 
-@user_passes_test(lambda user: user.is_student)
-@login_required(login_url='/login/')
+@student_required
 def web_notification_details(request,id):
     dt=get_object_or_404(DB_Web_Notification,id=id)
     return render(request,"student__web_notification_details.html",{'id':id,'data':dt})

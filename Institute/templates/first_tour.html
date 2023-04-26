@@ -16,7 +16,15 @@
 		<!-- STYLE CSS -->
 		<link rel="stylesheet" href="{% static 'css/first_tour_style.css' %}">
 	</head>
+<style>
+@media (max-width:765px){
 
+    #wizard{
+        position: relative;
+        top:300px;
+    }
+}
+</style>
 	<body style="background: url('{% static 'img/form-wizard-bg.jpg' %}');  background-size: cover; ">
 
 		<div class="wrapper">
@@ -26,20 +34,54 @@
 	                <h4></h4>
 	                <section>
 	                	<div class="form-header">
-	                		<img src="{% static 'img/carasual.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                		<img src="{% static 'img/tour_01.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
 	                	</div>
 	                </section> 
+                     
             		<!-- SECTION 1 -->
 	                <h4></h4>
 	                <section>
 	                	<div class="form-header">
-	                		<img src="{% static 'img/carasual.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                		<img src="{% static 'img/tour_02.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
 	                	</div>
-	                </section>  
+	                </section> 
+                     
+            		<!-- SECTION 1 -->
+	                <h4></h4>
+	                <section>
+	                	<div class="form-header">
+	                		<img src="{% static 'img/tour_03.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                	</div>
+	                </section> 
+                     
+            		<!-- SECTION 1 -->
+	                <h4></h4>
+	                <section>
+	                	<div class="form-header">
+	                		<img src="{% static 'img/tour_04.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                	</div>
+	                </section> 
+                     
+            		<!-- SECTION 1 -->
+	                <h4></h4>
+	                <section>
+	                	<div class="form-header">
+	                		<img src="{% static 'img/tour_05.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                	</div>
+	                </section>
+            		<!-- SECTION 1 -->
+	                <h4></h4>
+	                <section>
+	                	<div class="form-header">
+	                		<img src="{% static 'img/tour_06.jpg' %}" alt="" height="100%" width="100%" style="margin-bottom: 40px; border-radius: 10px; border: 2px solid white; box-shadow: 0px 0px 15px;">
+	                	</div>
+	                </section> 
+                     
             	</div>
             </form>
 		</div>
 
+        <div id="preloader"></div>
 <!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -2137,7 +2179,21 @@
 </script>
 <!-- Template created and distributed by Colorlib -->
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        "use strict";
+      
+        /**
+         * Preloader
+         */
+        const preloader = document.querySelector('#preloader');
+        if (preloader) {
+          window.addEventListener('load', () => {
+            preloader.remove();
+          });
+        }
+    });
+</script>
 
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

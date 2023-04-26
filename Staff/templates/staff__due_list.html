@@ -107,7 +107,8 @@
                                     <td>{{r.due_remark}}</td> 
                                     <td>
                                         <center>
-                                            <a href="{% url 'due_update' r.id %}" class="btn btn-warning px-3">Edit</a> 
+                                            <a href="{% url 'due_clear' r.id %}" class="btn btn-warning px-3">Clear</a> 
+                                            <a href="{% url 'due_update' r.id %}" class="btn btn-primary px-3">Edit</a> 
                                         </center>
 
                                     </td>

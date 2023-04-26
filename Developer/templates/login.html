@@ -417,6 +417,7 @@ form.sign-in-form {
     <div class="container">
       <div class="forms-container">
         <div class="signin-signup">
+          {% if not request.user.is_authenticated %}
           <form action="#" class="sign-in-form" method="POST"> {% csrf_token %}
             <h2 class="title">Sign in</h2>
             <div class="input-field">
@@ -435,6 +436,47 @@ form.sign-in-form {
              Developed by <span style="color:#4481eb;"> RP Tech IT Solutions </span>
             </center>
           </form>
+          {% else %}
+          
+          <form action="#" class="sign-in-form" method="POST"> {% csrf_token %}
+
+             
+             {% if request.user.is_superuser %}
+             <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
+             <span style="position: relative; top:-10px; color:gray;">Developer</span><br>
+             {% elif request.user.is_institute %}
+             <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
+             <span style="position: relative; top:-10px; color:gray;">Institute</span><br>
+             {% elif request.user.is_staff %}
+             <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
+             <span style="position: relative; top:-10px;color:gray;">staff</span><br>
+             {% elif request.user.is_student %}
+             <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
+             <span style="position: relative; top:-10px; color:gray; ">Student</span><br>
+             {% endif %}
+             
+             <div style="display:flex;">
+              {% if request.user.is_superuser %}
+              <a href="{% url 'developer_dashboard' %}" class="" style="cursor:pointer;margin:10px; background:#4d84e2;border-radius:5px; padding:10px; text-decoration:none; color:white; font-weight:bold;">Dashboard</a>
+              {% elif request.user.is_institute %}
+              <a href="{% url 'institute_dashboard' %}" class="" style="cursor:pointer;margin:10px; background:#4d84e2;border-radius:5px; padding:10px; text-decoration:none; color:white; font-weight:bold;">Dashboard</a>
+              {% elif request.user.is_staff %}
+              <a href="{% url 'staff_dashboard' %}" class="" style="cursor:pointer;margin:10px; background:#4d84e2;border-radius:5px; padding:10px; text-decoration:none; color:white; font-weight:bold;">Dashboard</a>
+              {% elif request.user.is_student %}
+              <a href="{% url 'student_dashboard' %}" class="" style="cursor:pointer;margin:10px; background:#4d84e2;border-radius:5px; padding:10px; text-decoration:none; color:white; font-weight:bold;">Dashboard</a>
+              {% endif %}
+
+             <a href="{% url 'logout' %}" class="" style="cursor:pointer;margin:10px; background:red;border-radius:5px; padding:10px; text-decoration:none; color:white; font-weight:bold;">Logout</a>
+             </div>
+             <br><br>
+             <hr style="width:100%; border:1px solid gray;">
+             <center>
+             Copyright 2023 &#169; IMS. All Rights Reserved. <br>  
+             Developed by <span style="color:#4481eb;"> RP Tech IT Solutions </span>
+            </center>
+          </form>
+          {% endif %}
+
           <form action="#" method="POST" class="sign-up-form">{% csrf_token %}
             <h2 class="title">Institute Sign up</h2>
             <div class="input-field">
@@ -490,7 +532,7 @@ form.sign-in-form {
     </div>
 
 <script>
-  const sign_in_btn = document.querySelector("#sign-in-btn");
+const sign_in_btn = document.querySelector("#sign-in-btn");
 const sign_up_btn = document.querySelector("#sign-up-btn");
 const container = document.querySelector(".container");
 

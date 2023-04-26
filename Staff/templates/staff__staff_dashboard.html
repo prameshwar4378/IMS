@@ -137,9 +137,9 @@
                         <div class="card recent-sales overflow-auto">
 
                             <div class="card-body">
-                                <h5 class="card-title">Result <span>| Exam Name</span></h5>
+                                <h5 class="card-title">Notifications <span>| Active / Inactive</span></h5>
                                 <div >
-                                    <canvas id="result_chart" style="width:100%;"></canvas>
+                                    <canvas id="notification_chart" style="width:100%;"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -199,7 +199,7 @@
     };
 
     
-    var config3 = {
+    var config2 = {
         type: 'polarArea',
         data: {
           datasets: [{
@@ -224,6 +224,31 @@
       };
   
 
+      var config3 = {
+        type: 'pie',
+        data: {
+          datasets: [{
+            data: {{ data_notification|safe }},
+            backgroundColor: [
+            '#054483', '#02BC3D', '#E11717', '#F700FF', '#FFFB00 ','#00FFF0','#FF0083'
+            ],
+            label: 'Notifications'
+          }],
+          labels: {{ label_notification|safe }}
+        },
+        options: {
+          responsive: true,
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      };
+  
+
     window.onload = function() {
       var ctx = document.getElementById('bar-chart').getContext('2d');
       window.myBar = new Chart(ctx, config);
@@ -232,6 +257,9 @@
       window.myPie = new Chart(ctx1, config1);
 
       var ctx1 = document.getElementById('result_chart').getContext('2d');
+      window.myPie = new Chart(ctx1, config2);
+      
+      var ctx1 = document.getElementById('notification_chart').getContext('2d');
       window.myPie = new Chart(ctx1, config3);
     };
   

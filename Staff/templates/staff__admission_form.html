@@ -44,7 +44,7 @@
                                         <hr>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-4">{{ form.academic_session|as_crispy_field }}</div>
+                                        <div class="col-sm-4" style="display:none">{{ form.academic_session|as_crispy_field }}</div>
                                         <div class="col-sm-4">{{form.student_prn_no|as_crispy_field}}</div>
                                         <div class="col-sm-4">{{form.student_admission_date|as_crispy_field}}</div>
                                     </div> 
@@ -142,6 +142,12 @@
                                         <hr>
                                     </div>
                                     <div class="row">
+                                        <div class="col-sm-12">
+                                            <p class="alert alert-warning">Use system-generated credentials <span onclick=set_username() class="btn btn-secondary py-0">Click me</span>  <br>
+                                            if student_name = <b>Sagar</b> and date_of_birth = 21-02-1998  password = <b>Saga@1998</b></p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
                                         <div class="col-sm-4">{{form.username|as_crispy_field}}</div>
                                         <div class="col-sm-4">{{form.password1|as_crispy_field}}</div>
                                         <div class="col-sm-4">{{form.password2|as_crispy_field}}</div>
@@ -173,4 +179,44 @@
         document.getElementById("id_student_prn_no").value = prn_no;
     </script>
  
+    <script>
+        function set_username(){
+                const studentNameInput = document.getElementById("id_student_name");
+                const dateOfBirthInput = document.getElementById("id_student_dob");
+                const prn_no = document.getElementById("id_student_prn_no");
+ 
+                if (studentNameInput.value.trim() === "")
+                {
+                    alert("Student Name Missing ...!")
+                }
+                else if (dateOfBirthInput.value.trim() === "")
+                {
+                    alert("Date of Birth Missing ...!")
+
+                }
+                else if (prn_no.value.trim() === "")
+                {
+                    alert("PRN No Missing Missing ...!")
+
+                }
+                else
+                {    
+                    firstName = studentNameInput.value.split(" ")[0].toLowerCase();
+                    
+                    let date_parts = dateOfBirthInput.value.split('-');
+                    //let formattedDate = date_parts[2] + date_parts[1] + date_parts[0];
+                    
+                    let split_name_for_pass = firstName.charAt(0).toUpperCase() + firstName.slice(1, 4);
+                    
+                    //let username = firstName + formattedDate
+                    let password = split_name_for_pass + '@' + date_parts[0];
+
+                    document.getElementById("id_username").value=prn_no.value
+                    document.getElementById("id_password1").value=password
+                    document.getElementById("id_password2").value=password
+
+                }
+
+        } 
+    </script>
 {% endblock content %}

@@ -57,7 +57,7 @@ def login(request):
                     authlogin(request, user)
                 
                 # Redirect the user to the appropriate page
-                return redirect('/Institute',{'user',user})
+                return redirect('/Institute/first_tour',{'user',user})
     return render(request,'login.html',{'form':lg_form,'rg_form':rg_form})
 
 

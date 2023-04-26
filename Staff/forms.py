@@ -4,7 +4,7 @@ from Developer.models import CustomUser,DB_Session,DB_Fees,DB_Result,DB_Subjects
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 
 
 FINANCIAL_YEAR = (
@@ -39,18 +39,36 @@ class CustomStudentCreationForm(UserCreationForm):
         widgets = { 
             # 'academic_session': forms.ChoiceField(choices=FINANCIAL_YEAR,attrs={'onChange': 'Call_Get_PRN_Function()'}),
             'student_dob': forms.TextInput(attrs={'type': 'date'}),
-            'student_name': forms.TextInput(attrs={'autofocus': True}),
+            'student_name': forms.TextInput(attrs={'autofocus': True, }),
+            'student_prn_no': forms.TextInput(attrs={'readonly': True }),
             'is_student':forms.HiddenInput(),
         }
+        
+    # validatoions start     
+    def clean_student_mobile(self):
+        mobile = self.cleaned_data.get('student_mobile')
+        if mobile:
+            if not mobile.isdigit() or len(mobile) != 10:
+                raise ValidationError('Enter a valid 10 digit mobile number.')
+        return mobile
+         
+    def clean_parent_mobile(self):
+        mobile = self.cleaned_data.get('parent_mobile')
+        if mobile:
+            if not mobile.isdigit() or len(mobile) != 10:
+                raise ValidationError('Enter a valid 10 digit mobile number.')
+        return mobile
+
+
+    # validatoions stop     
    
  
 
 class FormStudentReceivedFees(forms.ModelForm):
     class Meta:
         model = DB_Fees
-        fields = ('academic_session','student_username','operator_username','operator_name','student_prn_no','student_name','student_class','received_remark','received_amount','amount_word','payment_mode','due_date','due_amount','due_remark')
+        fields = ('student_username','operator_username','operator_name','student_prn_no','student_name','student_class','received_remark','received_amount','amount_word','payment_mode','due_date','due_amount','due_remark')
         widgets={
-            'academic_session':forms.HiddenInput(), 
             'student_prn_no':forms.HiddenInput(),
             'student_name':forms.HiddenInput(),
             'student_username':forms.HiddenInput(),
@@ -67,9 +85,8 @@ class FormStudentReceivedFees(forms.ModelForm):
 class FormAddFees(forms.ModelForm):
     class Meta:
         model = DB_Fees
-        fields = ('academic_session','add_fees','fees_remark','student_prn_no','student_username')
+        fields = ('add_fees','fees_remark','student_prn_no','student_username')
         widgets={
-            'academic_session':forms.HiddenInput(), 
             'student_prn_no':forms.HiddenInput(), 
             'student_username':forms.HiddenInput(), 
         }
@@ -146,5 +163,6 @@ class Create_Web_Notification_Form(forms.ModelForm):
         model = DB_Web_Notification
         exclude = ('institute_code',)
         widgets={ 
+            'notification_valid_up_to': forms.TextInput(attrs={'type':'date'}),
             'notification_message': forms.Textarea(attrs={'rows': 4}),
-        }
+        } 

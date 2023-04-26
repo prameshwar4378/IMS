@@ -84,10 +84,7 @@ class CustomUser(AbstractUser):
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
     tour_is_completed=models.BooleanField(default=False)
-
-
-
-
+    is_institute_profile_completed=models.BooleanField(default=False)
 
 
 

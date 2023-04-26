@@ -14,6 +14,7 @@ urlpatterns = [
     path("delete_student/<int:id>",Staff_view.delete_student, name='delete_student'), 
     path("delete_fees_record/<int:id>",Staff_view.delete_fees_record, name='delete_fees_record'), 
     path('due_list/', Staff_view.due_list, name='due_list'),
+    path('due_clear/<int:id>',Staff_view.due_clear, name='due_clear'), 
     path('due_update/<int:id>', Staff_view.due_update, name='due_update'),
     path('update_academic_session/', Staff_view.update_academic_session, name='update_academic_session'),
     path('export_pdf_deu_records/', Staff_view.export_pdf_deu_records, name='export_pdf_deu_records'),

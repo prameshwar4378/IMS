@@ -2,3 +2,21 @@ table heading color : rgb(3, 119, 202)
 add krishna thore direct from git hub
 rameshwar pawar
 krishna thore
+
+
+Institute
+   
+
+
+Staff
+    1.  Dues records
+
+    2. Fees records
+        
+    3.Result Dashboard
+
+    4. subject wise result
+        subject name not showing on markshit
+
+notitfaction
+    noti valid up to filed add calender

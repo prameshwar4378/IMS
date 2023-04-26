@@ -109,12 +109,9 @@
                                             <a href=" " data-toggle="modal" data-target="#update_result"
                                                 onclick="update_result('{{r.id}}','{{r.subject_name}}','{{r.min_marks}}','{{r.obtained_marks}}','{{r.out_off_marks}}','{{r.percentage}}','{{r.result}}')"><i
                                                     class="bi bi-pencil-square px-2" style="font-size:20px"></i></a>
-                                            {% comment %} <a href=" {% url 'delete_result' r.id %}"><i
+                                            <a href=" {% url 'delete_result' r.id %}"><i
                                                     class="bi bi-trash-fill px-2 text-danger"
-                                                    style="font-size:20px"></i></a> {% endcomment %}
-                                                    <i onclick="delete_records('{{r.id}}')"
-                                                        class="bi bi-trash-fill px-2 text-danger"
-                                                        style="font-size:20px;cursor:pointer;" ></i> 
+                                                    style="font-size:20px"></i></a>  
                                                     
                                         </td>
                                     </tr>
@@ -240,22 +237,22 @@
                     <div class="row mt-2">
                         <div class="col-md">
                             <label for="min_marks" class="form-label requiredField mt-4">Minimum Mark *</label>
-                            <input type="text" name="min_marks" id="min_marks" placeholder="min_marks"
+                            <input type="number" name="min_marks" id="min_marks" placeholder="min_marks"
                                 class="form-control" onchange=calculate_percentage() required>
                         </div>
                         <div class="col-md">
                             <label for="obtained_marks" class="form-label requiredField mt-4">Obtained Mark *</label>
-                            <input type="text" name="obtained_marks" id="obtained_marks" placeholder="obtained_marks"
+                            <input type="number" name="obtained_marks" id="obtained_marks" placeholder="obtained_marks"
                                 class="form-control" onchange=calculate_percentage() required>
                         </div>
                         <div class="col-md">
                             <label for="out_off_marks" class="form-label requiredField mt-4">Out Of Mark *</label>
-                            <input type="text" name="out_off_marks" id="out_off_marks" placeholder="out_off_marks"
+                            <input type="number" name="out_off_marks" id="out_off_marks" placeholder="out_off_marks"
                                 class="form-control" onchange=calculate_percentage() required>
                         </div>
                         <div class="col-md">
                             <label for="percentage" class="form-label requiredField mt-4">Percentage *</label>
-                            <input type="text" name="percentage" id="percentage" placeholder="percentage"
+                            <input type="number" name="percentage" id="percentage" placeholder="percentage"
                                 class="form-control" style="background:#E6E6E6;cursor:disabled;" readonly>
                         </div>
                         <div class="col-md">
@@ -330,28 +327,28 @@
                         <div class="col-md">
                             <label for="txt_update_min_marks" class="form-label requiredField mt-4">Minimum Marks
                                 *</label>
-                            <input type="text" name="txt_update_min_marks" id="txt_update_min_marks"
+                            <input type="number" name="txt_update_min_marks" id="txt_update_min_marks"
                                 placeholder="min_marks" class="form-control mt-2" onchange=calculate_percentage()
                                 required>
                         </div>
                         <div class="col-md">
                             <label for="txt_update_obtained_marks" class="form-label requiredField mt-4">Obtained Marks
                                 *</label>
-                            <input type="text" name="txt_update_obtained_marks" id="txt_update_obtained_marks"
+                            <input type="number" name="txt_update_obtained_marks" id="txt_update_obtained_marks"
                                 placeholder="obtained_marks" class="form-control mt-2" onchange=calculate_percentage()
                                 required>
                         </div>
                         <div class="col-md">
                             <label for="txt_update_out_off_marks" class="form-label requiredField mt-4">Out Of Marks
                                 *</label>
-                            <input type="text" name="txt_update_out_off_marks" id="txt_update_out_off_marks"
+                            <input type="number" name="txt_update_out_off_marks" id="txt_update_out_off_marks"
                                 placeholder="out_off_marks" class="form-control mt-2" onchange=calculate_percentage()
                                 required>
                         </div>
                         <div class="col-md">
                             <label for="txt_update_percentage" class="form-label requiredField mt-4">Percentage
                                 *</label>
-                            <input type="text" name="txt_update_percentage" id="txt_update_percentage"
+                            <input type="number" name="txt_update_percentage" id="txt_update_percentage"
                                 placeholder="percentage" class="form-control mt-2"
                                 style="background:#E6E6E6;cursor:disabled;" readonly>
                         </div>

@@ -1,5 +1,6 @@
 {% extends 'staff_base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
 
 <main id="main" class="main">
@@ -20,254 +21,294 @@
             <div class="col-lg-12">
                 <div class="row mt-4">
                     <div class="col-sm-11">
-                        <a href="{% url 'update_student_profile' data.id %}" class="btn btn-primary">Update Profile</a>
-                        <a href="{% url 'print_admission_form' data.id %}" class="btn btn-primary">Print Admission Form</a>
-                        <a href="{% url 'student_result_dashboard' data.id %}" class="btn btn-primary">Results</a>
-                        <a href="#" class="btn btn-success" data-toggle="modal"
+                        <a href="{% url 'update_student_profile' data.id %}" class="btn btn-primary mt-2">Update
+                            Profile</a>
+                        <a href="{% url 'print_admission_form' data.id %}" class="btn btn-primary mt-2">Print Admission
+                            Form</a>
+                        <a href="{% url 'student_result_dashboard' data.id %}" class="btn btn-primary mt-2">Results</a>
+                        <a href="#" class="btn btn-success mt-2" data-toggle="modal"
                             data-target="#StudentReceivedFeesForm">Received Fees</a>
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#StudentAddFeesForm">Allocate
-                                Fees</a>
+                        <a href="#" class="btn btn-success mt-2" data-toggle="modal"
+                            data-target="#StudentAddFeesForm">Allocate
+                            Fees</a>
                     </div>
                     <div class="col-sm-1">
-                        <a href="" class="btn btn-danger" data-toggle="modal"
+                        <a href="" class="btn btn-danger mt-2" data-toggle="modal"
                             data-target="#delete_student_model">Delete</a>
                     </div>
                 </div>
                 <hr>
 
+                <div class="container mb-3 " style="width:95%;">
+                    <div class="row ">
+                        <div class="col-sm-2 px-2 py-2">
+                            <div class="px-4 py-3 bg-light"
+                                style="border-radius:10px; background:white; box-shadow:0px 0px 10px -3px;height:100%;">
+                                {% if data.student_profile %}
+                                <img src="/media/{{data.student_profile}}" alt="" style="width:100%;">
+                                {% else %}
+                                <img src="{% static 'img/profile_sample.jpg' %}" alt="" style="width:100%;">
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-sm-6 px-2 py-2">
+                            <div class="px-4 py-3 bg-light"
+                                style="border-radius:10px; background:white; box-shadow:0px 0px 10px -3px;height:100%;">
+                                <b>PRN No :</b> {{data.student_prn_no}} <br>
+                                <b>Name :</b> {{data.student_name}} <br>
+                                <b>Class :</b> {{data.student_class}} <br>
+                                <b>Mobile :</b> {{data.student_mobile}} <br>
+                            </div>
+                        </div>
 
-                <div class="row alert alert-primary">
-                    <div class="col-sm-6">
-                        <b>Name :</b> {{data.student_prn_no}} <br>
-                        <b>Name :</b> {{data.student_name}} <br>
-                        <b>Class :</b> {{data.student_class}} <br>
-                        <b>Mobile :</b> {{data.student_mobile}} <br>
-                    </div>
-                    <div class="col-sm-6">
-                        <b>Village :</b> {{data.student_village}} <br>
-                        <b>Taluka :</b> {{data.student_taluka}} <br>
-                        <b>Dist :</b> {{data.student_dist}} <br>
+                        <div class="col-sm-4 px-2 py-2">
+                            <div class="px-4 py-3 bg-light"
+                                style="border-radius:10px; background:white; box-shadow:0px 0px 10px -3px; height:100%;">
+                                <b>Village :</b> {{data.student_village}} <br>
+                                <b>Taluka :</b> {{data.student_taluka}} <br>
+                                <b>Dist :</b> {{data.student_dist}} <br>
+                                <b>academic_session :</b> {{data.academic_session}} <br>
+                            </div>
+                        </div>
+                        {% comment %} <div class="col-sm-6">
+                            <b>Village :</b> {{data.student_village}} <br>
+                            <b>Taluka :</b> {{data.student_taluka}} <br>
+                            <b>Dist :</b> {{data.student_dist}} <br>
+                        </div> {% endcomment %}
                     </div>
                 </div>
 
 
-                <div class="row ">
 
-                    <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
-                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
-                            <div class="card-header text-dark" style="background:#A0D2FF;">
-                                <b> Total Fees </b>
-                            </div>
-                            <div class="card-header py-2">
-                                <h3 class="card-title" style="font-size:30px;"><b>{{total_fees}}</b></h3>
+
+                <div class="container mb-3 " style="width:95%;">
+                    <div class="row ">
+                        <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                            <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                                <div class="card-header text-dark" style="background:#A0D2FF;">
+                                    <b> Total Fees </b>
+                                </div>
+                                <div class="card-header py-2">
+                                    <h3 class="card-title" style="font-size:30px;"><b>{{total_fees}}</b></h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
-                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
-                            <div class="card-header text-dark" style="background:#A0D2FF;">
-                                <b> Collected Fees </b>
-                            </div>
-                            <div class="card-header py-2">
-                                <h3 class="card-title" style="font-size:30px;"><b>{{collected_fees}}</b></h3>
+                        <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                            <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                                <div class="card-header text-dark" style="background:#A0D2FF;">
+                                    <b> Collected Fees </b>
+                                </div>
+                                <div class="card-header py-2">
+                                    <h3 class="card-title" style="font-size:30px;"><b>{{collected_fees}}</b></h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
-                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
-                            <div class="card-header text-dark" style="background:#A0D2FF;">
-                                <b> Pending Dues </b>
-                            </div>
-                            <div class="card-header py-2">
-                                <h3 class="card-title" style="font-size:30px;"><b>{{pending_dues}}</b></h3>
+                        <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                            <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                                <div class="card-header text-dark" style="background:#A0D2FF;">
+                                    <b> Pending Dues </b>
+                                </div>
+                                <div class="card-header py-2">
+                                    <h3 class="card-title" style="font-size:30px;"><b>{{pending_dues}}</b></h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
-                        <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
-                            <div class="card-header text-dark" style="background:#A0D2FF;">
-                                <b> Total Pending </b>
-                            </div>
-                            <div class="card-header py-2">
-                                <h3 class="card-title" style="font-size:30px;"><b>{{total_pending}}</b></h3>
+                        <div class="col-sm-3 mt-2" data-aos="zoom-in" data-aos-duration="1000">
+                            <div class="card text-center" style="box-shadow:5px 5px 8px -2px; border:2px solid white;">
+                                <div class="card-header text-dark" style="background:#A0D2FF;">
+                                    <b> Total Pending </b>
+                                </div>
+                                <div class="card-header py-2">
+                                    <h3 class="card-title" style="font-size:30px;"><b>{{total_pending}}</b></h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
-            </div>
 
 
-            <div class="container" style="width:95%;">
-                <div class="mt-4"
-                    style="background:white; height:450px;  overflow:scroll;  box-shadow:0px 0px 10px -3px; border-radius:10px; user-select: none; ">
-                    <center>
-                        <h2 class="mt-3" style="color:#4678A4;"><b>Collected Fees or Dues Records</b></h2>
-                    </center>
-                    <table class="table table-hover px-4 py-4" style="min-width: max-content; background:white;">
-                        {% if fees_rec %}
-                        <thead>
-                            <tr style="background:#02B4C3;">
-                                <th scope="col" class="text-center text-white" style="">Student Name</th>
-                                <th scope="col" class="text-center text-white" style="">Received Amount</th>
-                                <th scope="col" class="text-center text-white" style="">Amount Remark</th>
-                                <th scope="col" class="text-center text-white" style="">Payment mode</th>
-                                <th scope="col" class="text-center text-white" style="">Due Date</th>
-                                <th scope="col" class="text-center text-white" style="">Due Amount</th>
-                                <th scope="col" class="text-center text-white" style="">Action</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for r in fees_rec %}
-                            {% if r.received_amount %}
-                            <tr class="text-center">
-                                <td>{{r.student_name}}</td>
-                                <td>{{r.received_amount}}</td>
-                                <td>{{r.received_remark}}</td>
-                                <td>{{r.payment_mode}}</td>
-                                <td>{{r.due_date}}</td>
-                                <td>{{r.due_amount}}</td>
-                                <td>
-                                    <a href="{% url 'print_fees_receipt' r.id %}"><i class="bi bi-printer-fill px-2"
-                                            style="font-size:20px"></i></a>
-                                    <a href="{% url 'due_update' r.id %}"><i class="bi bi-pencil-square px-2"
-                                            style="font-size:20px"></i></a>
-                                    <a href="{% url 'delete_fees_record' r.id %}"><i
-                                            class="bi bi-trash-fill px-2 text-danger" style="font-size:20px"></i></a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
+                <div class="container" style="width:95%;">
+                    <div class="mt-4"
+                        style=" height:450px;  overflow:scroll;  box-shadow:0px 0px 10px -3px; border-radius:10px; user-select: none; ">
                         <center>
-                            <h3>No Record Found</h3>
+                            <h2 class="mt-3" style="color:#4678A4;"><b>Collected Fees or Dues Records</b></h2>
                         </center>
-                        {% endif %}
-                    </table>
-                </div>
+                        <table class="table table-hover px-4 py-4" style="min-width: max-content; background:white;">
+                            {% if fees_rec %}
+                            <thead>
+                                <tr style="background:#02B4C3;">
+                                    <th scope="col" class="text-center text-white" style="">Student Name</th>
+                                    <th scope="col" class="text-center text-white" style="">Received Amount</th>
+                                    <th scope="col" class="text-center text-white" style="">Amount Remark</th>
+                                    <th scope="col" class="text-center text-white" style="">Payment mode</th>
+                                    <th scope="col" class="text-center text-white" style="">Due Date</th>
+                                    <th scope="col" class="text-center text-white" style="">Due Amount</th>
+                                    <th scope="col" class="text-center text-white" style="">Action</th>
 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in fees_rec %}
+                                {% if r.received_amount %}
+                                <tr class="text-center">
+                                    <td>{{r.student_name}}</td>
+                                    <td>{{r.received_amount}}</td>
+                                    <td>{{r.received_remark}}</td>
+                                    <td>{{r.payment_mode}}</td>
+                                    {% if r.due_date %}
+                                    <td>{{r.due_date}}</td>
+                                    {% else %}
+                                    <td>-----</td>
+                                    {% endif %}
+                                    {% if r.due_amount %}
+                                    <td>{{r.due_amount}}</td>
+                                    {% else %}
+                                    <td>-----</td>
+                                    {% endif %}
 
-
-
-                <div class="mt-4"
-                    style="background:white; height:450px;  overflow:scroll;  box-shadow:0px 0px 10px -3px; border-radius:10px; user-select: none; ">
-                    <center>
-                        <h2 class="mt-3" style="color:#4678A4;"><b>Allocated Fees Records</b></h2>
-                    </center>
-                    <table class="table table-hover px-4 py-4" style="min-width: max-content; background:white;">
-                        {% if fees_rec %}
-                        <thead>
-                            <tr style="background:#02B4C3;">
-                                <th scope="col" class="text-center text-white" style="">Student PRN No</th>
-                                <th scope="col" class="text-center text-white" style="">Fees Amount</th>
-                                <th scope="col" class="text-center text-white" style="">Fees Description</th> 
-                                <th scope="col" class="text-center text-white" style="">Action</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for r in fees_rec %}
-                            {% if r.add_fees %}
-                            <tr class="text-center">
-                                <td>{{r.student_prn_no}}</td>
-                                <td>{{r.add_fees}}</td>
-                                <td>{{r.fees_remark}}</td>
-                                <td> 
-                                    <a href=" " data-toggle="modal" data-target="#update_allocated_fees" onclick="update_allocated_fees('{{r.id}}','{{r.add_fees}}','{{r.fees_remark}}')"><i class="bi bi-pencil-square px-2" style="font-size:20px"></i></a>
-                                    <a href="{% url 'delete_fees_record' r.id %}"><i
-                                            class="bi bi-trash-fill px-2 text-danger" style="font-size:20px"></i></a>
-                                </td>
-                            </tr>
+                                    <td>
+                                        <a href="{% url 'print_fees_receipt' r.id %}"><i class="bi bi-printer-fill px-2"
+                                                style="font-size:20px"></i></a>
+                                        <a href="{% url 'due_update' r.id %}"><i class="bi bi-pencil-square px-2"
+                                                style="font-size:20px"></i></a>
+                                        <a href="{% url 'delete_fees_record' r.id %}"><i
+                                                class="bi bi-trash-fill px-2 text-danger"
+                                                style="font-size:20px"></i></a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            {% else %}
+                            <center>
+                                <h3>No Record Found</h3>
+                            </center>
                             {% endif %}
-                            {% endfor %}
-                        </tbody>
-                        {% else %}
+                        </table>
+                    </div>
+
+
+
+
+                    <div class="mt-4"
+                        style="height:450px;  overflow:scroll;  box-shadow:0px 0px 10px -3px; border-radius:10px; user-select: none; ">
                         <center>
-                            <h3>No Record Found</h3>
+                            <h2 class="mt-3" style="color:#4678A4;"><b>Allocated Fees Records</b></h2>
                         </center>
-                        {% endif %}
-                    </table>
+                        <table class="table table-hover px-4 py-4" style="min-width: max-content; background:white;">
+                            {% if fees_rec %}
+                            <thead>
+                                <tr style="background:#02B4C3;">
+                                    <th scope="col" class="text-center text-white" style="">Student PRN No</th>
+                                    <th scope="col" class="text-center text-white" style="">Fees Amount</th>
+                                    <th scope="col" class="text-center text-white" style="">Fees Description</th>
+                                    <th scope="col" class="text-center text-white" style="">Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in fees_rec %}
+                                {% if r.add_fees %}
+                                <tr class="text-center">
+                                    <td>{{r.student_prn_no}}</td>
+                                    <td>{{r.add_fees}}</td>
+                                    <td>{{r.fees_remark}}</td>
+                                    <td>
+                                        <a href=" " data-toggle="modal" data-target="#update_allocated_fees"
+                                            onclick="update_allocated_fees('{{r.id}}','{{r.add_fees}}','{{r.fees_remark}}')"><i
+                                                class="bi bi-pencil-square px-2" style="font-size:20px"></i></a>
+                                        <a href="{% url 'delete_fees_record' r.id %}"><i
+                                                class="bi bi-trash-fill px-2 text-danger"
+                                                style="font-size:20px"></i></a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                            {% else %}
+                            <center>
+                                <h3>No Record Found</h3>
+                            </center>
+                            {% endif %}
+                        </table>
+                    </div>
+
                 </div>
 
-            </div>
 
 
-
-            <!-- Modal -->
-            <div class="modal fade" id="StudentReceivedFeesForm" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Add Fees</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                <!-- Modal -->
+                <div class="modal fade" id="StudentReceivedFeesForm" tabindex="-1" role="dialog"
+                    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Receive Fees</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="POST" id="first-form" novalidate>
+                                    {% csrf_token %}
+                                    {{fees_form.student_prn_no|as_crispy_field}}
+                                    {{fees_form.student_username|as_crispy_field}}
+                                    {{fees_form.student_name|as_crispy_field}}
+                                    {{fees_form.operator_username|as_crispy_field}}
+                                    {{fees_form.operator_name|as_crispy_field}}
+                                    {{fees_form.payment_mode|as_crispy_field}}
+                                    {% comment %} {{fees_form.received_date|as_crispy_field}} {% endcomment %}
+                                    {{fees_form.received_amount|as_crispy_field}}
+                                    {{fees_form.received_remark|as_crispy_field}}
+                                    {{fees_form.amount_word|as_crispy_field}}
+                                    {{fees_form.due_date|as_crispy_field}}
+                                    {{fees_form.due_amount|as_crispy_field}}
+                                    {{fees_form.due_remark|as_crispy_field}}
+                                    <span style="display:none;">{{fees_form.student_class|as_crispy_field}}</span>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <input type="submit" value="Save changes" class="btn btn-primary">
+                            </div>
+                            </form>
                         </div>
-                        <div class="modal-body">
-                            <form action="" method="POST" id="first-form" novalidate>
-                                {% csrf_token %}
-                                {{fees_form.academic_session|as_crispy_field}}
-                                {{fees_form.student_prn_no|as_crispy_field}}
-                                {{fees_form.student_username|as_crispy_field}}
-                                {{fees_form.student_name|as_crispy_field}}
-                                {{fees_form.operator_username|as_crispy_field}}
-                                {{fees_form.operator_name|as_crispy_field}}
-                                {{fees_form.payment_mode|as_crispy_field}}
-                                {% comment %} {{fees_form.received_date|as_crispy_field}} {% endcomment %}
-                                {{fees_form.received_amount|as_crispy_field}}
-                                {{fees_form.received_remark|as_crispy_field}}
-                                {{fees_form.amount_word|as_crispy_field}}
-                                {{fees_form.due_date|as_crispy_field}}
-                                {{fees_form.due_amount|as_crispy_field}}
-                                {{fees_form.due_remark|as_crispy_field}}
-                                <span style="display:none;">{{fees_form.student_class|as_crispy_field}}</span>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" value="Save changes" class="btn btn-primary">
-                        </div>
-                        </form>
                     </div>
                 </div>
-            </div>
 
 
-            <!-- Modal -->
-            <div class="modal fade" id="StudentAddFeesForm" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Allocate Fees</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                <!-- Modal -->
+                <div class="modal fade" id="StudentAddFeesForm" tabindex="-1" role="dialog"
+                    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Allocate Fees</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="" method="POST" id="second-form" novalidate>
+                                    {% csrf_token %}
+                                    {{add_fees_form.student_username|as_crispy_field}}
+                                    {{add_fees_form.student_prn_no|as_crispy_field}}
+                                    {{add_fees_form.add_fees|as_crispy_field}}
+                                    {{add_fees_form.fees_remark|as_crispy_field}}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <input type="submit" value="Save changes" class="btn btn-primary">
+                            </div>
+                            </form>
                         </div>
-                        <div class="modal-body">
-                            <form action="" method="POST" id="second-form" novalidate>
-                                {% csrf_token %}
-                                <span >{{ add_fees_form.academic_session|as_crispy_field}}</span>
-                                {{add_fees_form.student_username|as_crispy_field}}
-                                {{add_fees_form.student_prn_no|as_crispy_field}}
-                                {{add_fees_form.add_fees|as_crispy_field}}
-                                {{add_fees_form.fees_remark|as_crispy_field}}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <input type="submit" value="Save changes" class="btn btn-primary">
-                        </div>
-                        </form>
                     </div>
                 </div>
-            </div>
 
-        </div><!-- End Left side columns -->
+            </div><!-- End Left side columns -->
     </section>
 
 
@@ -276,8 +317,8 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="update_allocated_fees" tabindex="-1" role="dialog"
-    aria-labelledby="exampleModalCenterTitle" aria-hidden="true" >
+<div class="modal fade" id="update_allocated_fees" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -289,23 +330,27 @@
             <div class="modal-body">
                 <form action="" method="POST">
                     {% csrf_token %}
-                                
-                        <input type="hidden" name="txt_update_allocated_id" id="txt_update_allocated_id" class="form-control">
-                        <span>
-                        <label for="txt_update_allocated_fees" class="form-label requiredField mt-3">Amount</label>
-                        <input type="text" name="txt_update_allocated_fees" id="txt_update_allocated_fees" class="form-control">
-                    </span>
-                                                
+
+                    <input type="hidden" name="txt_update_allocated_id" id="txt_update_allocated_id"
+                        class="form-control">
                     <span>
-                        <label for="txt_update_allocated_fees_remark" class="form-label requiredField mt-3">Remark</label>
-                        <input type="text" name="txt_update_allocated_fees_remark" id="txt_update_allocated_fees_remark" class="form-control">
+                        <label for="txt_update_allocated_fees" class="form-label requiredField mt-3">Amount</label>
+                        <input type="text" name="txt_update_allocated_fees" id="txt_update_allocated_fees"
+                            class="form-control">
                     </span>
-                        
-                <span>
-                    <center>
-                        <input type="submit" class="btn btn-primary mt-3 px-4" value="Update Fees">
-                    </center>
-                </span>
+
+                    <span>
+                        <label for="txt_update_allocated_fees_remark"
+                            class="form-label requiredField mt-3">Remark</label>
+                        <input type="text" name="txt_update_allocated_fees_remark" id="txt_update_allocated_fees_remark"
+                            class="form-control">
+                    </span>
+
+                    <span>
+                        <center>
+                            <input type="submit" class="btn btn-primary mt-3 px-4" value="Update Fees">
+                        </center>
+                    </span>
 
                 </form>
             </div>
@@ -344,16 +389,15 @@
 
 
 <script>
-    {% comment %} document.getElementById('id_academic_session').value="{{request.user.academic_session}}" {% endcomment %}
+
     document.querySelector('#first-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
     document.querySelector('#second-form input[name="academic_session"]').value = "{{request.user.academic_session}}";
 
-    function update_allocated_fees(id,allocated_fees,fees_remark){
+    function update_allocated_fees(id, allocated_fees, fees_remark) {
         document.getElementById('txt_update_allocated_id').value = id;
         document.getElementById('txt_update_allocated_fees').value = allocated_fees;
         document.getElementById('txt_update_allocated_fees_remark').value = fees_remark;
     }
-
 </script>
 
 <script>

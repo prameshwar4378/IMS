@@ -93,7 +93,21 @@ def staff_dashboard(request):
             label_subject_name_result.append(i.subject_name)
             data_marks_result.append(int(i.obtained_marks)) 
 
+    label_notification=['Active','Inactive']
+    data_notification=[]
+    notification_rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    active=0
+    inactive=0
 
+    for i in notification_rec:
+        if today < i.notification_valid_up_to:
+            active+=1
+        elif today > i.notification_valid_up_to:
+            inactive+=1
+    data_notification.append(active)
+    data_notification.append(inactive)
+
+ 
     context={
             'today_admission':today_admission,
             'total_fees':total_fees,
@@ -109,6 +123,8 @@ def staff_dashboard(request):
             'exam_name_for_result_chart':exam_name_for_result_chart,
             'label_subject_name_result':label_subject_name_result,
             'data_marks_result':data_marks_result,
+            'label_notification':label_notification,
+            'data_notification':data_notification,
              }
     return render(request,'staff__staff_dashboard.html',context)
 
@@ -182,6 +198,7 @@ def student_fees_dashboard(request,id):
             if form_receive_fees.is_valid():
                 fm1 = form_receive_fees.save(commit=False)
                 fm1.institute_code = request.user.institute_code
+                fm1.academic_session = request.user.academic_session
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
                 form_receive_fees = FormStudentReceivedFees()
@@ -192,6 +209,7 @@ def student_fees_dashboard(request,id):
             if form_add_fees.is_valid():
                 fm = form_add_fees.save(commit=False)
                 fm.student_class = dt.student_class
+                fm.academic_session = request.user.academic_session
                 fm.institute_code = request.user.institute_code
                 form_add_fees.save()
                 messages.success(request, 'Fees Added Successfully...!')
@@ -303,6 +321,19 @@ def due_update(request,id):
         pi=DB_Fees.objects.get(pk=id)
         fm=FormStudentReceivedFees(instance=pi)
     return render(request,"staff__update_due_record.html",{'form':fm})
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def due_clear(request,id): 
+    DB_Fees.objects.filter(id=id).update(
+        due_date=None,
+        due_amount=None,
+        due_remark=None
+    )
+    messages.success(request,'Due has been cleared ...!')
+    return redirect('/Staff/due_list') 
+
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
