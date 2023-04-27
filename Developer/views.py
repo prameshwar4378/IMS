@@ -69,8 +69,10 @@ def home(request):
     return render(request,'developer_dashboard.html')
 
 def institute_list(request):
-    return render(request,'institute_list.html')
+    rec=CustomUser.objects.filter(is_institute=True)
+    return render(request,'institute_list.html', {'rec': rec})
 
+import time
 def add_institute(request):
     if request.method == 'POST':
         form = Custom_Institute_Creation_Form(request.POST, request.FILES)
@@ -78,11 +80,15 @@ def add_institute(request):
             form.save()
             messages.success(request,'Institute Added Successfully ...!')
             return redirect('/Developer/add_institute/')
-            # login(request, user)
     else:
         form = Custom_Institute_Creation_Form()
     return render(request, 'add_institute.html', {'form': form})
-# fm = form_add_fees.save(commit=False)
-# fm.student_class = dt.student_class
-# fm.institute_code = request.user.institute_code
-# form_add_fees.save()
+
+
+ 
+def delete_institute(request,id):
+        pi=CustomUser.objects.get(pk=id)
+        pi.delete()
+        messages.success(request,'Institute Deleted Successfully!!!')
+        return redirect('/Developer/institute_list/')
+

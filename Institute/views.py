@@ -65,6 +65,7 @@ def staff_list(request):
     rec=CustomUser.objects.filter(is_staff=True, institute_code=request.user.institute_code,is_superuser=False)
     return render(request,'staff_list.html',{'rec':rec})
 
+
 @institute_required
 @profile_completed_required
 def add_staff(request):
@@ -74,6 +75,11 @@ def add_staff(request):
             update_academic_session(request)
             return redirect('/Institute/add_staff')
     # code for update session common for all function End
+    
+    staff_count=CustomUser.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code,is_staff=True).count()
+    staff_number=int(staff_count)+1
+    staff_id=request.user.institute_code + "-EMP-" + str(staff_number)
+    
     if request.method == 'POST':
         form = CustomStaffCreationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -88,7 +94,7 @@ def add_staff(request):
             return redirect('/Institute/add_staff/')
     else:
         form = CustomStaffCreationForm()
-    return render(request,'add_staff.html', {'form': form})
+    return render(request,'add_staff.html', {'form': form,'staff_id':staff_id})
 
 
 @institute_required
@@ -123,6 +129,8 @@ def update_session(request,id):
         fm=Form_Financial_Year_Session(instance=pi)
     return render(request,'update_session.html', {'form': fm})
        
+
+@institute_required 
 @profile_completed_required
 def delete_session(request,id):
         pi=DB_Session.objects.get(pk=id)
@@ -140,6 +148,7 @@ def update_staff(request,id):
             update_academic_session(request)
             return redirect('/Institute/staff_list')
     # code for update session common for all function End
+
     if request.method=="POST":
         pi=CustomUser.objects.get(pk=id)
         fm=CustomStaffCreationForm(request.POST, instance=pi)
@@ -178,6 +187,13 @@ def complete_first_tour(request):
 
 @institute_required
 def complete_your_profile(request):
+    # code for update session common for all function start
+    if request.method=="POST":
+        if 'cmb_update_academic_session' in request.POST:
+            update_academic_session(request)
+            return redirect('/Institute/staff_list')
+    # code for update session common for all function End
+
     username=request.user.username
     random_letters = random.sample(username, 2)
     auto_generate_institute_code = ''.join(random_letters).upper() + str("-") + str(10)

@@ -64,10 +64,35 @@
                                     <td>
                                         <center>
                                             <a href="{% url 'update_staff' r.id %}" class="btn btn-warning px-3">Edit</a> 
-                                            <a href="{% url 'delete_staff' r.id %}" class="btn btn-danger px-3">Delete</a> 
+                                            <a href="" data-toggle="modal" data-target="#delete_staff" onclick="delete_staff('{{r.id}}','{{r.staff_name}}')" class="btn btn-danger px-3">Delete</a> 
                                         </center>
-
+                                        
                                     </td>
+
+                                                                            <!-- Modal -->
+                                        <div class="modal fade" id="delete_staff" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered" role="document" >
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-danger text-light">
+                                                    <h5 class="modal-title" id="exampleModalLongTitle">Create Notification</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <br>
+                                                    <h6>Are you sure to delete <b>"{{r.staff_name}}"</b></h6>
+                                                    <br>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="{% url 'delete_staff' r.id %}" class="btn btn-danger">Yes</a>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+
                                 </tr>
                                 {% endfor %}
                               
@@ -85,6 +110,12 @@
 </main><!-- End #main -->
 
 
+
+
+
+
+
+
 <script>
     table = $('#example').DataTable( {
         paging: true
@@ -96,4 +127,6 @@
         searching: true
     } );
 </script>
+
+ 
 {% endblock content %}

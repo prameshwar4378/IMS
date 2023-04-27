@@ -53,7 +53,7 @@ class CustomUser(AbstractUser):
     # fields for Staff 
     is_staff=models.BooleanField(default=False)
     staff_name=models.CharField(max_length=255,null=True)
-    staff_id_no=models.IntegerField(null=True)
+    staff_id_no=models.CharField(max_length=50,null=True)
     staff_profile=models.ImageField( upload_to="staff_profile/", null=True,blank=True)
 
     # fields for Student 
@@ -111,7 +111,7 @@ class DB_Fees(models.Model):
     received_date=models.DateField(auto_now=False, auto_now_add=True)
     received_remark=models.CharField(max_length=250 ,null=True)
     received_amount=models.DecimalField(max_digits=10, decimal_places=2,null=True)
-    amount_word=models.CharField(max_length=250)
+    amount_word=models.CharField(max_length=250,null=True,blank=True)
     payment_mode=models.CharField(max_length=50,choices=PAYMENT_MODE)
     due_date=models.DateField(auto_now=False, auto_now_add=False,blank=True,null=True)
     due_amount=models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)

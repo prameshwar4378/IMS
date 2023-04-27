@@ -21,7 +21,7 @@
             <div class="col-lg-12">
                 <div class="row">
                     <div class="container" style="max-width:90%;">
-                         <form method="POST" enctype="multipart/form-data">
+                         <form id="my-form" method="POST" enctype="multipart/form-data" action="{% url 'add_institute' %}">
                             {% csrf_token %}
                             {{form|crispy}}
                            <center> <input type="submit" value="Submit" class="btn btn-primary text-light px-5 px-3"></center>
@@ -37,4 +37,20 @@
 </main><!-- End #main -->
 
 
+<!-- Your loading spinner or progress bar HTML code -->
+<div id="loading-spinner" class="spinner-border text-primary" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+  
+  <script>
+    const form = document.getElementById('my-form');
+    const spinner = document.getElementById('loading-spinner');
+    
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      form.style.display = 'none';
+      spinner.style.display = 'block';
+      form.submit();
+    });
+  </script>
 {% endblock content %}

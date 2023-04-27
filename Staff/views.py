@@ -14,6 +14,25 @@ from .filters import DueFees_Filter,Student_name_Filter,Attendance_Filter
 from . import export
 from django.forms import formset_factory
 from datetime import date
+import requests
+
+def send_received_fees_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id):
+    url = 'http://apitxt.com/api/sendMsg'
+    payload = {
+        'authkey': auth_key,
+        'mobiles': mobiles,
+        'message': message,
+        'sender': sender,
+        'route': route,
+        'unicode': unicode,
+        'pe_id': pe_id,
+        'template_id': template_id
+    }
+    response = requests.post(url, data=payload)
+    if response.status_code == 200:
+        return True
+    else:
+        return False
 
 
 @user_passes_test(lambda user: user.is_staff)
@@ -99,8 +118,12 @@ def staff_dashboard(request):
     active=0
     inactive=0
 
+    
     for i in notification_rec:
-        if today < i.notification_valid_up_to:
+        if not i.notification_valid_up_to:
+            active+=1
+            continue
+        elif today < i.notification_valid_up_to:
             active+=1
         elif today > i.notification_valid_up_to:
             inactive+=1
@@ -201,6 +224,29 @@ def student_fees_dashboard(request,id):
                 fm1.academic_session = request.user.academic_session
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
+                
+                name = dt.student_name
+                print(name)
+                print(name)
+                print(name)
+                installment_number = 3
+                amount = request.POST.get('received_amount') 
+                sender_name = "RP Tech"
+                message = f"Dear {name}, You have successfully paid {installment_number} installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {sender_name} - PWRDAS"
+
+
+                auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
+                mobiles = dt.student_mobile
+                print(mobiles)
+                print(mobiles)
+                print(mobiles)
+                message = message
+                sender = "PWRDAS"
+                route = "4"
+                unicode = "0"
+                pe_id = "1701163403601611113"
+                template_id = "1707163436871688505"
+                send_received_fees_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
                 form_receive_fees = FormStudentReceivedFees()
                 return redirect(f'/Staff/student_fees_dashboard/{id}')
         
@@ -325,15 +371,49 @@ def due_update(request,id):
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
-def due_clear(request,id): 
+def due_clear(request,id):
+    today=date.today()
+ 
+
     DB_Fees.objects.filter(id=id).update(
         due_date=None,
         due_amount=None,
         due_remark=None
     )
-    messages.success(request,'Due has been cleared ...!')
-    return redirect('/Staff/due_list') 
+ 
+    record=DB_Fees.objects.filter(id=id)
+    for i in record:
+        student_username=i.student_username
+        operator_username=i.operator_username
+        operator_name=i.operator_name
+        payment_mode=i.payment_mode
+        student_class=i.student_class
+        received_date=today
+        received_amount=i.received_amount
+        received_remark=i.received_remark
+        academic_session=request.user.academic_session
+        student_name=i.student_name
+        student_prn_no=i.student_prn_no
+        institute_code=i.institute_code 
 
+    insert_rec=DB_Fees(
+        student_username=student_username,
+        operator_username=operator_username,
+        operator_name=operator_name,
+        payment_mode=payment_mode,
+        student_class=student_class,
+        received_date=received_date,
+        received_amount=received_amount,
+        received_remark=received_remark + " - From Due",
+        academic_session=academic_session,
+        student_name=student_name,
+        student_prn_no=student_prn_no,
+        institute_code=institute_code,
+    )
+    insert_rec.save()
+    
+    messages.success(request,'Due has cleared and Amount added to the student profile') 
+    return redirect('/Staff/due_list') 
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
@@ -756,10 +836,14 @@ def create_web_notification(request):
     active=0
     inactive=0
     for i in rec:
-        if today < i.notification_valid_up_to:
+        if  i.notification_valid_up_to == None:
             active+=1
-        elif today > i.notification_valid_up_to:
-            inactive+=1
+            continue
+        else:
+            if today <= i.notification_valid_up_to:
+                active+=1
+            elif today > i.notification_valid_up_to:
+                inactive+=1
         
 
     form=Create_Web_Notification_Form() 
@@ -812,4 +896,3 @@ def web_notification_details(request,id):
     dt=get_object_or_404(DB_Web_Notification,id=id)
     return render(request,"staff__web_notification_details.html",{'id':id,'data':dt})
 
- 

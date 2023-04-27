@@ -108,7 +108,9 @@
                                         <td>{{i.student_prn_no}}</td> 
                                         <td>{{i.student_class}}</td> 
                                         <td>
-                                            {% if today < i.notification_valid_up_to %}
+                                            {% if today <= i.notification_valid_up_to %}
+                                                <span class="btn btn-success">Active</span>
+                                            {% elif not i.notification_valid_up_to %}
                                                 <span class="btn btn-success">Active</span>
                                             {% else %}
                                                 <span class="btn btn-secondary">Inctive</span>

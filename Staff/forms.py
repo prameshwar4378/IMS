@@ -77,7 +77,7 @@ class FormStudentReceivedFees(forms.ModelForm):
             'operator_name':forms.HiddenInput(),
             'received_date': forms.TextInput(attrs={'type': 'date'}),
             'due_date': forms.TextInput(attrs={'type': 'date'}),
-            'received_amount': forms.TextInput(attrs={'onChange': 'numberToWord()'}),
+            'received_amount': forms.NumberInput(attrs={'onChange': 'numberToWord()'}),
         }
             
  

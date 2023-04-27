@@ -97,6 +97,17 @@
       text-decoration:none;
     }
 
+    
+    @media (max-width:376px){
+      .session_title{
+          display:none;
+      }
+  }
+  @media (max-width:344px){
+    .session_icon{
+        display:none;
+    }
+}
 </style>
 <body>
 
@@ -113,7 +124,7 @@
   </div><!-- End Logo -->
 
   <div class="px-4" >
-     <a href="{% url 'update_academic_session' %}" style="text-decoration:none;color:rgb(3, 119, 202);"> session : {{user.academic_session}} <i class="bi bi-caret-down-square" ></i></a>
+     <a href="{% url 'update_academic_session' %}" style="text-decoration:none;color:rgb(3, 119, 202);">  <span class="session_title"> session :</span> {{user.academic_session}} <span class="session_icon">  <i class="bi bi-caret-down-square" ></i></span></a>
   </div><!-- End Search Bar -->
 
 
@@ -129,9 +140,9 @@
 
               <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                 {% if request.user.staff_profile %}
-                <img src="/media/{{request.user.staff_profile}}" alt="Profile" class="rounded-circle">
+                <img src="/media/{{request.user.staff_profile}}" alt="Profile" class="rounded-circle" style="width:40px; height:40px;">
                 {% else %}
-                <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle">
+                <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle" style="width:40px; height:40px;">
                 {% endif %}
                   <span class="d-none d-md-block dropdown-toggle ps-2">{{user.staff_name}}</span>
               </a><!-- End Profile Iamge Icon -->

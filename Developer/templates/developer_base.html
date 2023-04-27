@@ -97,6 +97,16 @@
       text-decoration:none;
     }
 
+    @media (max-width:376px){
+      .session_title{
+          display:none;
+      }
+  }
+  @media (max-width:344px){
+    .session_icon{
+        display:none;
+    }
+}
 </style>
 <body>
 
@@ -113,7 +123,7 @@
   </div><!-- End Logo -->
 
   <div class="px-4" >
-     <a href="{% url 'update_academic_session' %}" style="text-decoration:none;color:rgb(3, 119, 202);"> session : {{user.academic_session}} <i class="bi bi-caret-down-square" ></i></a>
+     <a href="" style="text-decoration:none;color:rgb(3, 119, 202);"  data-toggle="modal" data-target="#update_academic_session"> <span class="session_title"> session :</span> {{user.academic_session}} <span class="session_icon">  <i class="bi bi-caret-down-square" ></i></span></a>
   </div><!-- End Search Bar -->
 
 
@@ -128,17 +138,17 @@
           <li class="nav-item dropdown pe-3 text-center  ">
 
               <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                {% if request.user.staff_profile %}
-                <img src="/media/{{request.user.staff_profile}}" alt="Profile" class="rounded-circle">
-                {% else %}
-                <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle">
-                {% endif %}
-                  <span class="d-none d-md-block dropdown-toggle ps-2">{{user.staff_name}}</span>
+                {% if request.user.institute_logo %}
+                  <img src="/media/{{request.user.institute_logo}}" alt="Profile" class="rounded-circle"  style="width:40px; height:40px;">
+                  {% else %} 
+                  <img src="{% static 'img/profile_sample.jpg' %}" alt="Profile" class="rounded-circle" style="width:40px; height:40px;">
+                  {% endif %}
+                  <span class="d-none d-md-block dropdown-toggle ps-2"> {{request.user.username}}</span>
               </a><!-- End Profile Iamge Icon -->
 
               <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                   <li class="dropdown-header">
-                      <h6>{{user.staff_name}}</h6>
+                      <h6>{{request.user.username}}</h6>
                       <span>Developer</span>
                   </li>
                   <li>
@@ -165,22 +175,35 @@
 
   <ul class="sidebar-nav" id="sidebar-nav">
 
-      <li class="nav-item">
-          <a class="nav-link " href=" ">
+    <li class="nav-item">
+          <a class="nav-link " href="{% url 'institute_dashboard' %}">
               <i class="bi bi-grid"></i>
               <span>DASHBOARD</span>
           </a>
-      </li><!-- End Dashboard Nav -->
+      </li>
+
+      
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'add_institute' %}">
+          <i class="bi bi-card-list"></i>
+            <span>Add Institute</span>
+        </a>
+      </li>
 
       <li class="nav-item">
-          <a class="nav-link " href="{% url 'institute_list' %}">
-              <i class="bi bi-clipboard-check"></i>
-              <span>INSTITUTE LIST</span>
-          </a>
+        <a class="nav-link " href="{% url 'institute_list' %}">
+          <i class="bi bi-card-list"></i>
+            <span>Institute List</span>
+        </a>
       </li>
- 
 
-
+        {% comment %} <li class="nav-item">
+          <a class="nav-link " href="{% url 'manage_session' %}">
+            <i class="bi bi-card-list"></i>
+              <span>Manage Session</span>
+          </a>
+        </li> {% endcomment %}
+      
   </ul>
 </aside><!--  End Sidebar-->
 
@@ -211,6 +234,38 @@
 
   {% block content %}{% endblock content %}
 
+
+<!-- Modal -->
+<div class="modal fade" id="update_academic_session" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h4 class="modal-title text-white" id="exampleModalLongTitle">Update Academic Session</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-left">
+        <form action="" method="post">
+          {% csrf_token %}
+          <select name="cmb_update_academic_session" id="cmb_academic_session" class="form-control">
+            <option value="">-----</option>
+            <option value="2022-23">2022-23</option>
+            <option value="2023-24">2023-24</option>
+            <option value="2024-25">2024-25</option>
+            <option value="2025-26">2025-26</option>
+          </select>
+
+       
+      </div>
+      <div class="modal-footer">
+        <input type="submit" value="Update" class="btn btn-primary"> &nbsp;
+      </form>
+        <button  type="button" class="btn btn-secondary bgcolor px-3" data-dismiss="modal">No</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -290,6 +345,7 @@
          
         {% elif msg.tags == 'info' %}
         swal({
+          title: "Oops",
           text: "{{msg}}",
           icon: "info",
           button: "OK",
@@ -299,5 +355,6 @@
     {% endfor %}
 </script>
  
+
 
 </html>
