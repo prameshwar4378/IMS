@@ -224,10 +224,10 @@ def complete_your_profile(request):
                 recipient_list = [request.user.email]
 
                 username=request.user.username
-                if request.session.get('get_session_password')[0]:
-                    password_in_session=request.session.get('get_session_password')[0]
+                if 'get_session_password' in request.session and request.session['get_session_password']:
+                    password_in_session = request.session['get_session_password'][0]
                 else:
-                    password_in_session="----"
+                    password_in_session = "----"
                 password = '****' + str(password_in_session[-4:])
                 html_message = render_to_string('registration_complete_email_template.html', {'username':username,'password_in_session':password,'institute_name':institute_name})
                 send_mail(
