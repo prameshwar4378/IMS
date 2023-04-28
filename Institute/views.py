@@ -4,6 +4,9 @@ from django.contrib import messages
 from Developer.models import DB_Session,CustomUser
 from django.contrib.auth.decorators import login_required, user_passes_test
 import random
+
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 # Create your views here.
 
 
@@ -214,6 +217,27 @@ def complete_your_profile(request):
                 user.institute_logo = institute_logo
                 user.is_institute_profile_completed=True
                 user.save()
+                
+                # Email Templates Start 
+                subject = 'Registration Successfully ...!'
+                from_email = 'prameshwar437@gmail.com'
+                recipient_list = [request.user.email]
+
+                username=request.user.username
+                if request.session.get('get_session_password')[0]:
+                    password_in_session=request.session.get('get_session_password')[0]
+                else:
+                    password_in_session="----"
+                password = '****' + str(password_in_session[-4:])
+                html_message = render_to_string('registration_complete_email_template.html', {'username':username,'password_in_session':password,'institute_name':institute_name})
+                send_mail(
+                    subject=subject,
+                    message='Congratulations for registred IMS',
+                    from_email=from_email,
+                    recipient_list=recipient_list,
+                    html_message=html_message,
+                )
+
                 messages.success(request, 'Profile Updated Success...!.')
                 return redirect('/Institute/')
     return render(request,'complete_your_profile.html',{'auto_generate_institute_code':auto_generate_institute_code})

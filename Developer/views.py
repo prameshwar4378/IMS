@@ -6,7 +6,6 @@ from .forms import Custom_Institute_Creation_Form,login_form
 from django.contrib import messages
 from Institute.forms import CustomStaffCreationForm
 from Developer.models import CustomUser
-
 # Create your views here.
 def index(request):
     return render(request,'index.html')
@@ -38,6 +37,8 @@ def login(request):
             username = request.POST.get('txt_sign_up_username', False)
             email = request.POST.get('txt_sign_up_email', False)
             password = request.POST.get('txt_sign_up_password', False)
+
+            request.session['get_session_password']=request.POST.get('txt_sign_up_password'),
             
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request,'Username already exists!')
@@ -55,7 +56,7 @@ def login(request):
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     authlogin(request, user)
-                
+
                 # Redirect the user to the appropriate page
                 return redirect('/Institute/first_tour',{'user',user})
     return render(request,'login.html',{'form':lg_form,'rg_form':rg_form})

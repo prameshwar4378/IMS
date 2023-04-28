@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from PIL import Image
+import io
 
 GENDER = (
     ("Male", "Male"), 
@@ -85,7 +86,18 @@ class CustomUser(AbstractUser):
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
     tour_is_completed=models.BooleanField(default=False)
     is_institute_profile_completed=models.BooleanField(default=False)
+ 
+    # from PIL import Image
+    # def save(self,):
+    #     super().save()
+    #     student_profile = Image.open(self.student_profile.path)
+        
 
+    #     if student_profile.height > 1500 or student_profile.width > 1500:
+    #         output_size = (1500, 1500)
+    #         student_profile.thumbnail(output_size)
+    #         student_profile.save(self.student_profile.path) 
+        
 
 
 PAYMENT_MODE = (
@@ -174,3 +186,5 @@ class DB_Web_Notification(models.Model):
     upload_file3=models.FileField(upload_to="Notes", max_length=100,null=True,blank=True)
     notification_valid_up_to=models.DateField(auto_now=False, auto_now_add=False,null=True,blank=True)
     date_time=models.DateField(auto_now=False, auto_now_add=True,null=True)
+
+

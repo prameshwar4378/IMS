@@ -516,9 +516,11 @@ form.sign-in-form {
             <p>
               The software has three distinct user profiles: student, staff, and institute. Each profile has an same login page.
             </p>
+            {% if not request.user.is_authenticated %}
             <button class="btn transparent" id="sign-up-btn">
               Sign up
             </button>
+            {% endif %}
           </div>
           <img src=" " class="image" alt="" />
         </div>
