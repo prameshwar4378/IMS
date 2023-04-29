@@ -204,6 +204,12 @@
                 </button>
             </div>
             <div class="modal-body">
+                {% if not exam_record %}
+                    <div class="alert alert-warning">Exam not schedule for your class <a href="{% url 'schedule_exam' %}" style="text-decoration:none; width:50%;">click here</a></div>
+                {% endif %}
+                {% if not subject_name %}
+                <div class="alert alert-warning">Subject not added for your class <a href="{% url 'manage_subjects' %}" style="text-decoration:none; width:50%;">click here</a></div>
+                {% endif %}
                 <form action="" method="POST" id="first-form">
                     {% csrf_token %}
                     <div class="row">

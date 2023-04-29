@@ -18,6 +18,17 @@ class CustomStaffCreationForm(UserCreationForm):
         }
    
  
+class CustomStaffUpdateForm(UserCreationForm):
+    is_staff = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), initial=True)
+    status = forms.ChoiceField(choices=STATUS, initial='Active')
+    class Meta:
+        model = CustomUser
+        fields = ('staff_profile','staff_name','email','staff_id_no','is_staff','status','password1','password2')
+        widgets = { 
+            'is_staff':forms.HiddenInput(),
+        }
+   
+ 
 class Form_Financial_Year_Session(forms.ModelForm):
     financial_year = forms.CharField(
         max_length=7,

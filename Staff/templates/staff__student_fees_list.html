@@ -29,6 +29,7 @@
                             <thead>
                                 <tr style="background:#02B4C3;">
                                         <th scope="col" class="text-center text-white" style="">PRN No</th>
+                                        <th scope="col" class="text-center text-white" style="">Username</th>
                                         <th scope="col" class="text-center text-white" style="">Name</th>
                                         <th scope="col" class="text-center text-white" style="">Gender</th>
                                         <th scope="col" class="text-center text-white" style="">Class</th> 
@@ -40,6 +41,7 @@
                                 {% for r in rec %}
                                 <tr>
                                     <td>{{r.student_prn_no}}</td>
+                                    <td>{{r.username}}</td>
                                     <td>{{r.student_name}}</td>
                                     <td>{{r.student_gender}}</td>
                                     <td>{{r.student_class}}</td> 

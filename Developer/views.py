@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth import login as authlogin, authenticate,logout as DeleteSession
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
-from .forms import Custom_Institute_Creation_Form,login_form
+from .forms import Custom_Institute_Creation_Form,login_form,Custom_Institute_Update_Form
 from django.contrib import messages
 from Institute.forms import CustomStaffCreationForm
 from Developer.models import CustomUser
@@ -84,8 +84,21 @@ def add_institute(request):
     else:
         form = Custom_Institute_Creation_Form()
     return render(request, 'add_institute.html', {'form': form})
+ 
+def update_institute(request,id):
+    if request.method=="POST":
+        pi=CustomUser.objects.get(pk=id)
+        fm=Custom_Institute_Update_Form(request.POST,request.FILES, instance=pi)
+        if fm.is_valid():
+            fm.save()
+            messages.success(request,'Notification Updated Successfully')
+            return redirect('/Developer/institute_list/')
+    else:
+        pi=CustomUser.objects.get(pk=id)
+        fm=Custom_Institute_Update_Form(instance=pi)
+    return render(request,'update_institute.html',{'form':fm})
 
-
+      
  
 def delete_institute(request,id):
         pi=CustomUser.objects.get(pk=id)

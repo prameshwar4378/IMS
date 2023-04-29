@@ -64,6 +64,59 @@ class CustomStudentCreationForm(UserCreationForm):
    
  
 
+
+
+
+
+class CustomStudentUpdateForm(UserCreationForm):
+    student_admission_date = forms.DateField(initial=timezone.now().date(), widget=forms.DateInput(attrs={'type': 'date'}))
+    # academic_session=forms.ChoiceField(choices=FINANCIAL_YEAR, widget=forms.Select(attrs={'onchange': 'Call_Get_PRN_Function()', 'class': 'form-control'}))
+    is_student = forms.BooleanField(widget=forms.CheckboxInput(attrs={'class': 'checkbox'}), initial=True)
+    status = forms.ChoiceField(choices=STUDENT_STATUS, initial='Active')
+    class Meta:
+        model = CustomUser
+        fields = ('is_student','academic_session','student_profile','student_name','student_gender','student_dob','student_village','student_taluka','student_dist','parent_name','parent_mobile','parent_village','parent_taluka','parent_dist','student_collage','student_collage_address','batch','group','student_prn_no','student_admission_date','student_class','student_mobile','status','password1','password2')
+        labels = {
+            'student_name': 'Full Name',
+            'student_profile': 'Upload Profile Image',
+            'student_gender': 'Gender',
+            'student_dob': 'Date of Birth',
+            'student_mobile': 'Mobile Number',
+            'student_village': 'Village',
+            'student_taluka': 'Taluka',
+            'student_dist': 'Dist',
+        }   
+        widgets = { 
+            # 'academic_session': forms.ChoiceField(choices=FINANCIAL_YEAR,attrs={'onChange': 'Call_Get_PRN_Function()'}),
+            'student_dob': forms.TextInput(attrs={'type': 'date'}),
+            'student_name': forms.TextInput(attrs={'autofocus': True, }),
+            'student_prn_no': forms.TextInput(attrs={'readonly': True }),
+            'is_student':forms.HiddenInput(),
+        }
+        
+    # validatoions start     
+    def clean_student_mobile(self):
+        mobile = self.cleaned_data.get('student_mobile')
+        if mobile:
+            if not mobile.isdigit() or len(mobile) != 10:
+                raise ValidationError('Enter a valid 10 digit mobile number.')
+        return mobile
+         
+    def clean_parent_mobile(self):
+        mobile = self.cleaned_data.get('parent_mobile')
+        if mobile:
+            if not mobile.isdigit() or len(mobile) != 10:
+                raise ValidationError('Enter a valid 10 digit mobile number.')
+        return mobile
+
+
+    # validatoions stop     
+   
+ 
+
+
+
+
 class FormStudentReceivedFees(forms.ModelForm):
     class Meta:
         model = DB_Fees

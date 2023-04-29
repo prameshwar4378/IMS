@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .forms import CustomStudentCreationForm,Form_academic_session,Form_Subject,Form_Schedule_Exam,Create_Web_Notification_Form
+from .forms import CustomStudentCreationForm,Form_academic_session,Form_Subject,Form_Schedule_Exam,Create_Web_Notification_Form,CustomStudentUpdateForm
 from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance,DB_Web_Notification
 from Staff.forms import FormStudentReceivedFees,FormAddFees,AttendanceForm,UpdateAttendanceForm
 from django.contrib import messages
@@ -289,7 +289,7 @@ def student_fees_dashboard(request,id):
 def update_student_profile(request,id):
     if request.method=="POST":
         pi=CustomUser.objects.get(pk=id)
-        fm=CustomStudentCreationForm(request.POST,request.FILES, instance=pi)
+        fm=CustomStudentUpdateForm(request.POST,request.FILES, instance=pi)
         if fm.is_valid():
             fm.save()
             messages.success(request,'Profile Updated Successfully')
@@ -298,7 +298,7 @@ def update_student_profile(request,id):
         # return redirect('/Admin_Home/admin_vehical_records/')
     else:
         pi=CustomUser.objects.get(pk=id)
-        fm=CustomStudentCreationForm(instance=pi)
+        fm=CustomStudentUpdateForm(instance=pi)
     return render(request,'staff__update_student_profile.html',{'form':fm})
 
 
