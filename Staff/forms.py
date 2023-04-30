@@ -43,6 +43,17 @@ class CustomStudentCreationForm(UserCreationForm):
             'student_prn_no': forms.TextInput(attrs={'readonly': True }),
             'is_student':forms.HiddenInput(),
         }
+    
+    def clean_student_profile(self):
+        student_profile = self.cleaned_data.get('student_profile', False)
+        if student_profile:
+            # Check if the file size is greater than 1MB (1048576 bytes)
+            if student_profile.size > 1048576:
+                raise ValidationError("The uploaded image size should not exceed 1MB.")
+            return student_profile
+        else:
+            raise ValidationError("Couldn't read uploaded image.")
+ 
         
     # validatoions start     
     def clean_student_mobile(self):
@@ -63,11 +74,6 @@ class CustomStudentCreationForm(UserCreationForm):
     # validatoions stop     
    
  
-
-
-
-
-
 class CustomStudentUpdateForm(UserCreationForm):
     student_admission_date = forms.DateField(initial=timezone.now().date(), widget=forms.DateInput(attrs={'type': 'date'}))
     # academic_session=forms.ChoiceField(choices=FINANCIAL_YEAR, widget=forms.Select(attrs={'onchange': 'Call_Get_PRN_Function()', 'class': 'form-control'}))
@@ -109,7 +115,17 @@ class CustomStudentUpdateForm(UserCreationForm):
                 raise ValidationError('Enter a valid 10 digit mobile number.')
         return mobile
 
-
+    
+    def clean_student_profile(self):
+        student_profile = self.cleaned_data.get('student_profile', False)
+        if student_profile:
+            # Check if the file size is greater than 1MB (1048576 bytes)
+            if student_profile.size > 1048576:
+                raise ValidationError("The uploaded image size should not exceed 1MB.")
+            return student_profile
+        else:
+            raise ValidationError("Couldn't read uploaded image.")
+ 
     # validatoions stop     
    
  

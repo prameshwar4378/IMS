@@ -1,8 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from PIL import Image
-import io
+import io 
 
+ 
 GENDER = (
     ("Male", "Male"), 
     ("Female", "Female"), 
@@ -37,6 +38,8 @@ CLASS = (
 
 STUDENT_STATUS=(("Active","Active"),("Inactive","Inactive"))
 
+ 
+
 class CustomUser(AbstractUser):
     # Genaral fields 
     id = models.AutoField(primary_key=True)
@@ -59,7 +62,7 @@ class CustomUser(AbstractUser):
 
     # fields for Student 
     is_student=models.BooleanField(default=False)
-    student_profile=models.ImageField( upload_to="student_profile/", null=True,blank=True)
+    student_profile=models.ImageField(upload_to="student_profile/", null=True,blank=True)
     student_prn_no=models.CharField(max_length=50,null=True,unique=True)
     student_admission_date=models.DateField(auto_now=False, auto_now_add=False,null=True)
     student_name=models.CharField(max_length=255,null=True)
@@ -86,20 +89,10 @@ class CustomUser(AbstractUser):
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
     tour_is_completed=models.BooleanField(default=False)
     is_institute_profile_completed=models.BooleanField(default=False)
+
+
  
-    # from PIL import Image
-    # def save(self,):
-    #     super().save()
-    #     student_profile = Image.open(self.student_profile.path)
-        
-
-    #     if student_profile.height > 1500 or student_profile.width > 1500:
-    #         output_size = (1500, 1500)
-    #         student_profile.thumbnail(output_size)
-    #         student_profile.save(self.student_profile.path) 
-        
-
-
+ 
 PAYMENT_MODE = (
     ("Cash", "Cash"), 
     ("Phone Pay", "Phone Pay"), 

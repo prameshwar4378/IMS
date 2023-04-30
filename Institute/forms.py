@@ -4,6 +4,7 @@ from Developer.models import CustomUser,DB_Session
 from django import forms
 from django.contrib.auth.forms  import AuthenticationForm
 from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
 
 STATUS=(("Active","Active"),("Inactive","Inactive"))
 
@@ -16,6 +17,17 @@ class CustomStaffCreationForm(UserCreationForm):
         widgets = { 
             'is_staff':forms.HiddenInput(),
         }
+    
+    def clean_staff_profile(self):
+        staff_profile = self.cleaned_data.get('staff_profile', False)
+        if staff_profile:
+            # Check if the file size is greater than 1MB (1048576 bytes)
+            if staff_profile.size > 1048576:
+                raise ValidationError("The uploaded image size should not exceed 1MB.")
+            return staff_profile
+        else:
+            raise ValidationError("Couldn't read uploaded image.")
+ 
    
  
 class CustomStaffUpdateForm(UserCreationForm):
@@ -27,6 +39,17 @@ class CustomStaffUpdateForm(UserCreationForm):
         widgets = { 
             'is_staff':forms.HiddenInput(),
         }
+    
+    def clean_staff_profile(self):
+        staff_profile = self.cleaned_data.get('staff_profile', False)
+        if staff_profile:
+            # Check if the file size is greater than 1MB (1048576 bytes)
+            if staff_profile.size > 1048576:
+                raise ValidationError("The uploaded image size should not exceed 1MB.")
+            return staff_profile
+        else:
+            raise ValidationError("Couldn't read uploaded image.")
+ 
    
  
 class Form_Financial_Year_Session(forms.ModelForm):

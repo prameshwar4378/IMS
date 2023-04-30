@@ -52,7 +52,9 @@ def export_result_report_subject_wise(request,subject,prn):
         "institute_logo":institute_logo,
         "student_name":student_name,
         "student_class":student_class,
-        "student_prn_no":prn}
+        "student_prn_no":prn,
+        "subject_name":subject
+        }
     html = template.render(context)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Result.pdf"'
