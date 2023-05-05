@@ -231,7 +231,7 @@ def student_fees_dashboard(request,id):
                 print(name)
                 installment_number = 3
                 amount = request.POST.get('received_amount') 
-                sender_name = "RP Tech"
+                sender_name = "IMS"
                 message = f"Dear {name}, You have successfully paid {installment_number} installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {sender_name} - PWRDAS"
 
 

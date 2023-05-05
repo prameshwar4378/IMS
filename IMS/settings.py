@@ -131,7 +131,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATIC_ROOT = "/RP Tech/static/"
+STATIC_ROOT = "/IMS/static/"
 
 
 MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')

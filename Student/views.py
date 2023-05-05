@@ -200,7 +200,7 @@ def result_dashboard(request):
         if report_type == "Subject Wise":
             subject_name_1=request.POST.get('select_subject_for_report')
             student_prn_no=PRN_NO
-            responce = export.export_result_report_subject_wise(subject_name_1,student_prn_no)
+            responce = export.export_result_report_subject_wise(request,subject_name_1,student_prn_no)
             return responce
 
         elif report_type == "Exam Wise":

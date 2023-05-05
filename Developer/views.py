@@ -6,6 +6,8 @@ from .forms import Custom_Institute_Creation_Form,login_form,Custom_Institute_Up
 from django.contrib import messages
 from Institute.forms import CustomStaffCreationForm
 from Developer.models import CustomUser
+import csv
+
 # Create your views here.
 def index(request):
     return render(request,'index.html')
@@ -106,3 +108,26 @@ def delete_institute(request,id):
         messages.success(request,'Institute Deleted Successfully!!!')
         return redirect('/Developer/institute_list/')
 
+from Developer import import_export
+
+def import_export(request):
+    if request.method == "POST":  
+        if 'institute_import' in request.FILES: 
+            csv_file = request.FILES['institute_import']
+            decoded_file = csv_file.read().decode('utf-8').splitlines()
+            for i in decoded_file:
+                print(i)
+            reader = csv.DictReader(decoded_file)
+            for row in reader:
+                try:
+                    CustomUser.objects.create(
+                        username=row['username'],
+                        academic_session=row['academic_session'],
+                        institute_name=row['institute_name'],
+                        institute_address=row['institute_address'],
+                        institute_code=row['institute_code']
+                    )
+                except Exception as e:
+                    return redirect('/')
+                
+    return render(request,'import_export.html')
