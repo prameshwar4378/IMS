@@ -21,3 +21,46 @@ Staff
 
 notitfaction
     noti valid up to filed add calender
+
+
+
+
+#################### CODE FOR TWILIO MESSAGE ####################
+
+from twilio.rest import Client
+#def text_sms(message,mobile):
+#    account_sid = 'AC1c6f4b03e6236e59a06eaa0419485432'
+#    auth_token = '71e73bcd6a58706c71d10e3cadc2f483'
+#    client = Client(account_sid, auth_token)
+#    message = client.messages.create(
+#    from_='+12542764260',
+#    body=message,
+#    to='+91' + str(mobile)
+#    )
+#    print(message.sid)
+#
+#def whatsapp_sms(message, mobile):
+#    account_sid = 'AC1c6f4b03e6236e59a06eaa0419485432'
+#    auth_token = '71e73bcd6a58706c71d10e3cadc2f483'
+#    client = Client(account_sid, auth_token)
+#
+#    message = client.messages.create(
+#        from_='whatsapp:+14155238886',
+#        body=message,
+#        to=f"whatsapp:+91{mobile}"
+#    )
+#    print(message.sid)
+
+
+
+
+# if request.user.is_txt_sms:
+#     admission_message= f".\n\nDear {request.POST.get('student_name')}, \n\nCongratulations! Your admission process at {request.user.institute_name} is complete. \nYour PRN: {request.POST.get('student_prn_no')}, \nClass: {request.POST.get('student_class')}. \n\n Best regards, \n{request.user.institute_name}"
+#     base_url = request.scheme + '://' + request.get_host()
+#     credentials_message= f".\n\nPlease login to our portal for more information.\n\nUsername:{request.POST.get('username')}\n\nPassword:{request.POST.get('password1')} \n\n link:{base_url}\n\nRegards,\n{request.user.institute_name}"
+#     mobile=request.POST.get('student_mobile')  
+#     text_sms(admission_message,mobile)
+#     text_sms(credentials_message,mobile) 
+# if request.user.is_whats_app_sms:
+#     whatsapp_sms(admission_message,mobile)
+#     whatsapp_sms(credentials_message,mobile)

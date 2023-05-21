@@ -108,7 +108,6 @@ def delete_institute(request,id):
         messages.success(request,'Institute Deleted Successfully!!!')
         return redirect('/Developer/institute_list/')
 
-from Developer import import_export
 
 def import_export(request):
     if request.method == "POST":  

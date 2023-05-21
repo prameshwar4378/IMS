@@ -16,7 +16,7 @@ from django.forms import formset_factory
 from datetime import date
 import requests
 
-def send_received_fees_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id):
+def send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id):
     url = 'http://apitxt.com/api/sendMsg'
     payload = {
         'authkey': auth_key,
@@ -33,7 +33,6 @@ def send_received_fees_sms(auth_key, mobiles, message, sender, route, unicode, p
         return True
     else:
         return False
-
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
@@ -184,6 +183,18 @@ def new_admission(request):
             form.save()
             messages.success(request, 'Registration Successfully...!.')
             form = CustomStudentCreationForm()
+
+            if request.user.is_txt_sms:
+                auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
+                mobiles = request.POST.get('student_mobile')
+                message =  f"Dear {request.POST.get('student_name')}, \n\nYour Admission process is completed. \nPRN No :- {request.POST.get('student_prn_no')} \nStandard :- {request.POST.get('student_class')} \nBatch :- {'rameshwar'} \n\nHappy Learning...! \n\nThanks & Regards, \n{request.user.institute_name} - PWRDAS"
+                sender = "PWRDAS"
+                route = "4"
+                unicode = "0"
+                pe_id = "1701163403601611113"
+                template_id = "1707163462383724704"
+                send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+
             return redirect('/Staff/new_admission/')
     else:
         form = CustomStudentCreationForm()
@@ -225,28 +236,21 @@ def student_fees_dashboard(request,id):
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
                 
-                name = dt.student_name
-                print(name)
-                print(name)
-                print(name)
+                name = dt.student_name 
                 installment_number = 3
                 amount = request.POST.get('received_amount') 
                 sender_name = "IMS"
-                message = f"Dear {name}, You have successfully paid {installment_number} installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {sender_name} - PWRDAS"
-
+                message = f"Dear {name}, You have successfully paid installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
 
                 auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
-                mobiles = dt.student_mobile
-                print(mobiles)
-                print(mobiles)
-                print(mobiles)
+                mobiles = dt.student_mobile 
                 message = message
                 sender = "PWRDAS"
                 route = "4"
                 unicode = "0"
                 pe_id = "1701163403601611113"
                 template_id = "1707163436871688505"
-                send_received_fees_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+                send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
                 form_receive_fees = FormStudentReceivedFees()
                 return redirect(f'/Staff/student_fees_dashboard/{id}')
         
@@ -266,9 +270,6 @@ def student_fees_dashboard(request,id):
                 allocated_id = request.POST.get('txt_update_allocated_id')
                 allocated_fees = request.POST.get('txt_update_allocated_fees')
                 allocated_fees_remark = request.POST.get('txt_update_allocated_fees_remark')
-                print(allocated_id)
-                print(allocated_fees)
-                print(allocated_fees_remark)
                 DB_Fees.objects.filter(id=allocated_id).update(add_fees=allocated_fees, fees_remark=allocated_fees_remark)
                 messages.success(request, 'Fees Updated Successfully...!')
                 return redirect(f'/Staff/student_fees_dashboard/{id}')
@@ -373,7 +374,6 @@ def due_update(request,id):
 @login_required(login_url='/login/')
 def due_clear(request,id):
     today=date.today()
- 
 
     DB_Fees.objects.filter(id=id).update(
         due_date=None,
@@ -411,7 +411,19 @@ def due_clear(request,id):
         institute_code=institute_code,
     )
     insert_rec.save()
-    
+
+    dt=get_object_or_404(CustomUser,username=student_username)
+    message = f"Dear {student_name}, You have successfully paid installment of amount Rs.{received_amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
+    auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
+    mobiles = dt.student_mobile 
+    message = message
+    sender = "PWRDAS"
+    route = "4"
+    unicode = "0"
+    pe_id = "1701163403601611113"
+    template_id = "1707163436871688505"
+    send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+
     messages.success(request,'Due has cleared and Amount added to the student profile') 
     return redirect('/Staff/due_list') 
 
@@ -895,4 +907,31 @@ def update_web_notification(request,id):
 def web_notification_details(request,id):
     dt=get_object_or_404(DB_Web_Notification,id=id)
     return render(request,"staff__web_notification_details.html",{'id':id,'data':dt})
+ 
+
+def new_student_admissoin_object(student_name, student_village, student_gender):
+    student = CustomUser(student_name=student_name, student_village=student_village, student_gender=student_gender)
+    return student
+
+
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def import_export(request):
+    if request.method == 'POST': 
+        csv_file = request.FILES.get('import_file')
+        if csv_file:
+            csv_data = csv.reader(csv_file.read().decode('utf-8').splitlines())
+            next(csv_data)  # skip the header row
+
+            for row in csv_data:
+                name = row[0].strip()  # get the name field and remove leading/trailing spaces
+                gender = row[2].strip() or None  # get the gender field and convert empty string to None
+
+                student = CustomUser(student_name=name, student_gender=gender)
+                student.save()
+            # messages.success (request, 'Data imported successfully')
+        else:
+            messages.error(request, 'Please select a file to import')
+
+    return render(request,"staff__import_export.html")
 

@@ -89,6 +89,8 @@ class CustomUser(AbstractUser):
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
     tour_is_completed=models.BooleanField(default=False)
     is_institute_profile_completed=models.BooleanField(default=False)
+    is_txt_sms=models.BooleanField(default=True)
+    is_whats_app_sms=models.BooleanField(default=True)
 
 
  

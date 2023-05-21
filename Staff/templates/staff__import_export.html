@@ -1,0 +1,118 @@
+{% extends 'staff_base.html' %}
+
+{% block content %}
+<style>
+
+</style>
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Import / Export</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">import_export </a></li>
+            </ol>
+        </nav>
+        {% comment %} <a href="{% url 'new_admission' %}" class="btn btn-primary text-light"
+            style="position: relative; left:70%; top:-50px;"><b> New Admission</b></a> {% endcomment %}
+
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12 px-2 py-2 ">
+                 <div style="margin-bottom:20px;display:flex;text-align:center; border-radius:5px; padding:3px; border:2px solid rgb(3, 119, 202) ;">
+                    <div id="import_header_div" style="width:50%; padding:10px; cursor: pointer; font-weight:1000;" onclick="import_section()"><i class="bi bi-box-arrow-in-down" style="font-weight:1000;"></i> IMPORT</div>
+                    <div id="export_header_div" style="width:50%; padding:10px; cursor: pointer; font-weight:1000;" onclick="export_section()"><i class="bi bi-box-arrow-up" style="font-weight:1000;"></i> EXPORT</div>
+                 </div>   
+
+                 <div id="import_section">
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="file" name="import_file" class="form-control" >
+                        <center>
+                        <input type="submit" value="import" class="mt-4 btn btn-primary px-4 py-2">
+                        </center>
+                    </form>
+                    <br>
+                    
+                    {% if import_rec %}
+                    <div class="container" style=" overflow:scroll;">
+                        <table id="example" class="table table-striped " style="overflow:scroll; width:100%;min-width: max-content;">
+                            <thead>
+                                <tr style="background:rgb(3, 119, 202);">
+                                        <th scope="col" class="text-center text-white" style="">Name</th>
+                                        <th scope="col" class="text-center text-white" style="">Age</th>
+                                        <th scope="col" class="text-center text-white" style="">gender</th>
+                                        <th scope="col" class="text-center text-white" style="">class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                
+                                {% for r in import_rec %}
+
+                                <tr>
+                                    <td>{{r.name}}</td>
+                                    <td>{{r.age}}</td>
+                                    <td>{{r.gender}}</td>
+                                    <td>{{r.class}}</td>
+                                     
+                                </tr>
+                                {% endfor %}
+                              
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                 </div>
+
+                 
+
+                 <div id="export_section">
+pawar
+                 </div>
+                 
+            </div>
+        </div><!-- End Left side columns -->
+    </section>
+
+</main><!-- End #main -->
+
+<script>
+    document.getElementById('import_header_div').style.background = 'rgb(3, 119, 202) ';
+    document.getElementById('import_header_div').style.color = 'white';
+
+    document.getElementById('export_header_div').style.background = 'white';
+    document.getElementById('export_header_div').style.color = 'rgb(3, 119, 202) ';
+
+    document.getElementById('import_section').style.display = 'block';
+    document.getElementById('export_section').style.display = 'none';
+
+
+    function import_section(){
+        document.getElementById('import_header_div').style.background = 'rgb(3, 119, 202) ';
+        document.getElementById('import_header_div').style.color = 'white';
+
+        document.getElementById('export_header_div').style.background = 'white';
+        document.getElementById('export_header_div').style.color = 'rgb(3, 119, 202) ';
+
+        document.getElementById('import_section').style.display = 'block';
+        document.getElementById('export_section').style.display = 'none';
+    }
+
+    function export_section(){
+        document.getElementById('export_header_div').style.background = 'rgb(3, 119, 202) ';
+        document.getElementById('export_header_div').style.color = 'white';
+
+        document.getElementById('import_header_div').style.background = 'white';
+        document.getElementById('import_header_div').style.color = 'rgb(3, 119, 202) ';
+
+        
+        document.getElementById('import_section').style.display = 'none';
+        document.getElementById('export_section').style.display = 'block';
+    }
+</script>
+{% endblock content %}

@@ -59,6 +59,27 @@
   body{
     background:#F6FBFE;
   }
+
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-top: 16px solid #3498db;
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-left: -60px;
+    margin-top: -60px;
+    z-index: 9999;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
   /* Info Cards */
   .dashboard .info-card {
     padding-bottom: 10px;
@@ -108,6 +129,21 @@
         display:none;
     }
 }
+
+
+
+@keyframes fadeEffect {
+  0% {
+  opacity: 0;
+  transform: translateX(100px);
+  }
+  
+  100% {
+  opacity: 1;
+  transform: translateX(0);
+  }
+  }
+  
 </style>
 <body>
 
@@ -248,6 +284,12 @@
           </a>
         </li>
 
+        <li>
+          <a href="{% url 'import_export' %}" style="text-decoration:none;">
+              <i class="bi bi-arrow-down-up" style="font-size:15px;"></i><span>IMPORT/EXPORT</span>
+          </a>
+        </li>
+
       </ul>
     </li><!-- End Tables Nav -->
 
@@ -299,7 +341,7 @@
       </div>
   </footer><!-- End Footer -->
 
-
+  <div id="loader" class="loader"></div>
 </body>
 <script>
   !function(){"use strict";let e=(e,t=!1)=>(e=e.trim(),t)?[...document.querySelectorAll(e)]:document.querySelector(e),t=(t,s,l,r=!1)=>{r?e(s,r).forEach(e=>e.addEventListener(t,l)):e(s,r).addEventListener(t,l)},s=(e,t)=>{e.addEventListener("scroll",t)};e(".toggle-sidebar-btn")&&t("click",".toggle-sidebar-btn",function(t){e("body").classList.toggle("toggle-sidebar")}),e(".search-bar-toggle")&&t("click",".search-bar-toggle",function(t){e(".search-bar").classList.toggle("search-bar-show")});let l=e("#navbar .scrollto",!0),r=()=>{let t=window.scrollY+200;l.forEach(s=>{if(!s.hash)return;let l=e(s.hash);l&&(t>=l.offsetTop&&t<=l.offsetTop+l.offsetHeight?s.classList.add("active"):s.classList.remove("active"))})};window.addEventListener("load",r),s(document,r);let a=e("#header");if(a){let o=()=>{window.scrollY>100?a.classList.add("header-scrolled"):a.classList.remove("header-scrolled")};window.addEventListener("load",o),s(document,o)}}();
@@ -330,7 +372,24 @@
     integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
 </script> 
 
- 
+ <script>
+  window.addEventListener("DOMContentLoaded", function() {
+    var loader = document.getElementById("loader");
+    
+    // Show the loader initially
+    loader.style.display = "block";
+    
+    // Hide the loader when the page is fully loaded
+    window.addEventListener("load", function() {
+      loader.style.display = "none";
+    });
+    
+    // Show the loader if the browser shows the reverse spinning gray loading icon
+    window.addEventListener("unload", function() {
+      loader.style.display = "block";
+    });
+  });
+ </script>
 
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>

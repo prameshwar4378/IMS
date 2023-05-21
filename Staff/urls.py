@@ -34,6 +34,7 @@ urlpatterns = [
     path('delete_web_notification/<int:id>', Staff_view.delete_web_notification, name='delete_web_notification'), 
     path('update_web_notification/<int:id>',Staff_view.update_web_notification, name='update_web_notification'), 
     path('web_notification_details/<int:id>',Staff_view.web_notification_details, name='web_notification_details'), 
+    path('import_export',Staff_view.import_export, name='import_export'), 
 ]
-if settings.DEBUG:
+if settings.DEBUG: 
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
