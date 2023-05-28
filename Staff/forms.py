@@ -235,3 +235,41 @@ class Create_Web_Notification_Form(forms.ModelForm):
             'notification_valid_up_to': forms.TextInput(attrs={'type':'date'}),
             'notification_message': forms.Textarea(attrs={'rows': 4}),
         } 
+
+class BulkResultForm(forms.ModelForm):
+    class Meta:
+        model = DB_Result
+        fields = ('id', 'student_prn_no', 'obtained_marks')
+        widgets={
+            'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
+            'obtained_marks': forms.TextInput(attrs={'class':'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(BulkResultForm, self).__init__(*args, **kwargs)
+        self.fields['student_name'] = forms.CharField(
+            label='Student Name',
+            widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        )
+        self.fields['student_prn_no'] = forms.CharField(
+            label='student_prn_no',
+            widget=forms.TextInput(attrs={'readonly': 'readonly'})
+        )
+
+    # def clean_obtained_marks(self):
+    #     obtained_marks = self.cleaned_data.get('obtained_marks')
+    #     if obtained_marks == '':
+    #         obtained_marks = None
+    #     return obtained_marks
+
+
+class UpdateBulkResultForm(forms.ModelForm):
+    id = forms.CharField(widget=forms.HiddenInput())
+    class Meta:
+        model = DB_Result
+        fields = ('id', 'student_prn_no','student_name', 'obtained_marks')
+        widgets={
+            'student_prn_no': forms.TextInput(attrs={'class':'form-control'}),
+            'obtained_marks': forms.TextInput(attrs={'class':'form-control'}),
+            'student_name': forms.TextInput(attrs={'class':'form-control'}),
+        }

@@ -41,7 +41,7 @@ class Custom_Institute_Update_Form(UserCreationForm):
     class Meta:
         model = CustomUser
         exclude = ('username',)
-        fields = ('email', 'institute_name', 'institute_address', 'institute_code', 'institute_logo', 'is_institute', 'password1', 'password2')
+        fields = ('email', 'institute_name', 'institute_address', 'institute_code', 'institute_logo', 'is_institute','is_txt_sms','no_of_txt_sms', 'password1', 'password2')
 
     def clean_institute_logo(self):
         institute_logo = self.cleaned_data.get('institute_logo', False)

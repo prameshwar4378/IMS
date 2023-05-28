@@ -91,6 +91,7 @@ class CustomUser(AbstractUser):
     is_institute_profile_completed=models.BooleanField(default=False)
     is_txt_sms=models.BooleanField(default=True)
     is_whats_app_sms=models.BooleanField(default=True)
+    no_of_txt_sms=models.IntegerField(null=True)
 
 
  
@@ -136,13 +137,15 @@ class DB_Subjects(models.Model):
 
 
 class DB_Result(models.Model):
+    id=models.AutoField(primary_key=True)
+    student_name=models.CharField(max_length=50,null=True)
     academic_session=models.CharField(max_length=100, null=True)
     institute_code = models.CharField(max_length=500,null=True)
     student_prn_no=models.CharField(max_length=100, null=True)
     subject_name=models.CharField(max_length=100, null=True)
     student_class=models.CharField(max_length=100, null=True)
     min_marks=models.CharField(max_length=100, null=True)
-    obtained_marks=models.CharField(max_length=100, null=True)
+    obtained_marks=models.CharField(max_length=100, null=True, blank=True)
     out_off_marks=models.CharField(max_length=100, null=True)
     percentage=models.CharField(max_length=100, null=True)
     result=models.CharField(max_length=100, null=True)

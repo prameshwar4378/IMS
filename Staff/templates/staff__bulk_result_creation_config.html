@@ -1,0 +1,175 @@
+{% extends 'staff_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #f1f1f1;
+    }
+
+    #config_section {
+        background-color: #ffffff;
+        margin: 50px auto;
+        font-family: Raleway;
+        padding: 40px;
+        width: 80%;
+        min-width: 300px;
+    }
+</style>
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Config Result</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Config Result</a></li>
+            </ol>
+        </nav>
+        {% comment %} <a href="{% url 'new_admission' %}" class="btn btn-primary text-light"
+            style="position: relative; left:70%; top:-50px;"><b> New Admission</b></a> {% endcomment %}
+
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+                <div id="config_section">
+                    <div class="row">
+
+                        <form id="form_class_name" method="POST">{% csrf_token %}
+                            <div class="col-sm-12"> 
+                                <label for="class_name" class="form-label requiredField mt-4">Select Class *</label>
+                                <select name="class_name" id="class_name" class="form-control" onchange=sendClassValue()>
+                                    <option value=""> ------ </option>
+                                    {% for i in class_name %}
+                                    <option value="{{i.class_name}}">{{i.class_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        
+                        {% if session_result_config_class_name %}
+                        <form id="form_exam_name" method="POST">{% csrf_token %}
+                            <div class="col-sm-12"> 
+                                <label for="exam_name" class="form-label requiredField mt-4">Select Exam *</label>
+                                <select name="exam_name" id="exam_name" class="form-control" onchange=sendExam_name()>
+                                    {% for i in exam_name %}
+                                    <option value="{{i.exam_title}} | {{i.exam_start_date}} | {{i.exam_end_date}}">
+                                        {{i.exam_title}} | {{i.exam_start_date}} | {{i.exam_end_date}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        {% endif %}
+                                                
+                        {% if session_result_config_class_name and session_result_config_exam_name %}
+                        <form id="form_subject_name" method="POST">{% csrf_token %}
+                            <div class="col-sm-12"> 
+                                <label for="subject_name" class="form-label requiredField mt-4">Select Subject *</label>
+                                <select name="subject_name" id="subject_name" class="form-control" onchange=sendSubject_name()>
+                                    <option value=""></option>
+                                    {% for i in subject_name %}
+                                    <option value="{{i.subject_name}}">
+                                        {{i.subject_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                        {% endif %}
+                        
+                                                
+                        {% if session_result_config_class_name and session_result_config_exam_name and session_result_config_subject_name %}
+                        {% if not exam_alredy_exist %}
+                        <form id="marks" method="POST">{% csrf_token %}
+                            <div class="row">
+                                <div class="col-sm-6"> 
+                                    <label for="min_marks" class="form-label requiredField mt-4">Min Marks *</label>
+                                    <input type="number" name="min_marks" id="min_marks" class="form-control" onchange=sendMarks() required>
+                                </div>
+                                <div class="col-sm-6"> 
+                                    <label for="out_of_marks" class="form-label requiredField mt-4">Out of Marks *</label>
+                                    <input type="number" name="out_of_marks" id="out_of_marks" class="form-control" onchange=sendMarks() required>
+                                </div>
+                            </div>
+                        </form>
+                        {% else %}
+                        <br>
+                            <h5 class="alert alert-warning mt-3"> Exam Alredy Exist Do You Want To Update the Record</h5>
+                            <br>
+                            <a href="{% url 'update_bulk_result' %}" class="btn btn-primary">Update</a>
+                        {% endif %}
+                        {% endif %}
+                        
+                                                
+                        
+                        {% if session_result_config_class_name and session_result_config_exam_name and session_result_config_subject_name and session_result_config_min_marks  and session_result_config_out_of_marks %}
+                        {% if not exam_alredy_exist %}
+                        <center><br> 
+                            <a href="{% url 'create_bulk_result' %}" class="btn btn-success" onClick=sendMin_and_Out_of_Marks()> Procide </a>
+                        </center>
+                        {% endif %}
+                        {% endif %}
+                        
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Left side columns -->
+    </section>
+
+</main><!-- End #main -->
+
+ 
+<script>
+    function sendClassValue() {
+        var form = document.getElementById('form_class_name');
+        document.getElementById('class_name');
+        form.submit();
+    }
+ 
+    function sendExam_name() {
+        var form1 = document.getElementById('form_exam_name');
+        document.getElementById('exam_name');
+        form1.submit();
+    }
+  
+    function sendSubject_name() {
+        var form2 = document.getElementById('form_subject_name');
+        document.getElementById('subject_name');
+        form2.submit();
+    }
+   
+    function sendMarks() {
+        var form3 = document.getElementById('marks');
+        document.getElementById('min_marks');
+        document.getElementById('out_of_marks');
+        form3.submit(); 
+    }
+    
+</script>
+
+
+<script data-class-name="{{ session_result_config_class_name }}"  data-exam-name="{{ session_result_config_exam_name }}"  data-subject-name="{{ session_result_config_subject_name }}" data-min-marks="{{ session_result_config_min_marks }}" data-out-of-marks="{{ session_result_config_out_of_marks }}" >
+    var class_name = document.currentScript.getAttribute('data-class-name');
+    document.getElementById("class_name").value = class_name;
+
+    var exam_name = document.currentScript.getAttribute('data-exam-name');
+    document.getElementById("exam_name").value = exam_name;
+
+    var subject_name = document.currentScript.getAttribute('data-subject-name');
+    document.getElementById("subject_name").value = subject_name;
+
+    var min_marks = document.currentScript.getAttribute('data-min-marks');
+    document.getElementById("min_marks").value = min_marks;
+    
+    var out_of_marks = document.currentScript.getAttribute('data-out-of-marks');
+    document.getElementById("out_of_marks").value = out_of_marks;
+</script>
+
+
+{% endblock content %}

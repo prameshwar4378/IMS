@@ -14,8 +14,20 @@
 
             <!-- Left side columns -->
             <div class="col-lg-12">
-                <div class="row">
+              
+              {% if is_txt_sms %}
+                {% if no_of_txt_sms %}
+                  {% if no_of_txt_sms < 50 and no_of_txt_sms > 5 %}
+                  <p class="alert alert-warning">{{no_of_txt_sms}}</p>
+                  {% elif no_of_txt_sms <= 5 and no_of_txt_sms > 0 %}
+                  <p class="alert alert-danger">{{no_of_txt_sms}}</p>
+                  {% endif %}
+                {% else %}
+                  <p class="alert alert-danger">Sms pack not available. please contact to support team</p>
+                {% endif %}
+              {% endif %}
 
+                <div class="row">
                     <!-- Card -->
                     <div class="col-xxl-4 col-md-6">
                         <div class="card info-card sales-card">

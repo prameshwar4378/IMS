@@ -35,6 +35,9 @@ urlpatterns = [
     path('update_web_notification/<int:id>',Staff_view.update_web_notification, name='update_web_notification'), 
     path('web_notification_details/<int:id>',Staff_view.web_notification_details, name='web_notification_details'), 
     path('import_export',Staff_view.import_export, name='import_export'), 
+    path('config_result',Staff_view.config_result, name='config_result'), 
+    path('create_bulk_result',Staff_view.create_bulk_result, name='create_bulk_result'), 
+    path('update_bulk_result',Staff_view.update_bulk_result, name='update_bulk_result'), 
 ]
 if settings.DEBUG: 
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from .forms import CustomStudentCreationForm,Form_academic_session,Form_Subject,Form_Schedule_Exam,Create_Web_Notification_Form,CustomStudentUpdateForm
 from Developer.models import CustomUser,DB_Fees,DB_Session,DB_Result,DB_Subjects,DB_Schedule_Exam,DB_Attendance,DB_Web_Notification
-from Staff.forms import FormStudentReceivedFees,FormAddFees,AttendanceForm,UpdateAttendanceForm
+from Staff.forms import FormStudentReceivedFees,FormAddFees,AttendanceForm,UpdateAttendanceForm,BulkResultForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from datetime import datetime
@@ -33,6 +33,17 @@ def send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, temp
         return True
     else:
         return False
+
+def is_session_result_config_exist(view_func):
+    def wrapper(request, *args, **kwargs):
+        if request.session.get('is_session_result_config_exist', False):
+            # Session variable is True, execute the function
+            return view_func(request, *args, **kwargs)
+        else:
+            # Session variable is False, redirect to Home
+            return redirect('/Staff/config_result')  # Replace 'home' with the appropriate URL or view name
+    return wrapper
+
 
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
@@ -104,12 +115,13 @@ def staff_dashboard(request):
     label_subject_name_result=[]
     data_marks_result=[]
     for i in result_records:
-        if i.subject_name in label_subject_name_result:
-            subject_index_value=label_subject_name_result.index(i.subject_name)
-            data_marks_result[subject_index_value]+=int(i.obtained_marks)
-        else:
-            label_subject_name_result.append(i.subject_name)
-            data_marks_result.append(int(i.obtained_marks)) 
+        if not i.result =='Absent':
+            if i.subject_name in label_subject_name_result:
+                subject_index_value=label_subject_name_result.index(i.subject_name)
+                data_marks_result[subject_index_value]+=int(i.obtained_marks)
+            else:
+                label_subject_name_result.append(i.subject_name)
+                data_marks_result.append(int(i.obtained_marks)) 
 
     label_notification=['Active','Inactive']
     data_notification=[]
@@ -129,8 +141,11 @@ def staff_dashboard(request):
     data_notification.append(active)
     data_notification.append(inactive)
 
- 
+    get_sms_data=get_object_or_404(CustomUser,institute_code=request.user.institute_code,is_institute=True)
+
     context={
+            'no_of_txt_sms':get_sms_data.no_of_txt_sms,
+            'is_txt_sms':get_sms_data.is_txt_sms,
             'today_admission':today_admission,
             'total_fees':total_fees,
             'total_present_students':total_present_students,
@@ -184,16 +199,27 @@ def new_admission(request):
             messages.success(request, 'Registration Successfully...!.')
             form = CustomStudentCreationForm()
 
-            if request.user.is_txt_sms:
-                auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
-                mobiles = request.POST.get('student_mobile')
-                message =  f"Dear {request.POST.get('student_name')}, \n\nYour Admission process is completed. \nPRN No :- {request.POST.get('student_prn_no')} \nStandard :- {request.POST.get('student_class')} \nBatch :- {'rameshwar'} \n\nHappy Learning...! \n\nThanks & Regards, \n{request.user.institute_name} - PWRDAS"
-                sender = "PWRDAS"
-                route = "4"
-                unicode = "0"
-                pe_id = "1701163403601611113"
-                template_id = "1707163462383724704"
-                send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+            get_sms_data=get_object_or_404(CustomUser,institute_code=request.user.institute_code,is_institute=True)
+
+            if get_sms_data.is_txt_sms == True:
+                if int(get_sms_data.no_of_txt_sms) > 0:
+                    auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
+                    mobiles = request.POST.get('student_mobile')
+                    message =  f"Dear {request.POST.get('student_name')}, \n\nYour Admission process is completed. \nPRN No :- {request.POST.get('student_prn_no')} \nStandard :- {request.POST.get('student_class')} \nBatch :- {' '} \n\nHappy Learning...! \n\nThanks & Regards, \n{request.user.institute_name} - PWRDAS"
+                    sender = "PWRDAS"
+                    route = "4"
+                    unicode = "0"
+                    pe_id = "1701163403601611113"
+                    template_id = "1707163462383724704"
+                    try:
+                        send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+                        get_sms_data.no_of_txt_sms=int(get_sms_data.no_of_txt_sms) - 1
+                        get_sms_data.save()  
+                    except:
+                        messages.warning(request, 'Addmission Success but Problem with SMS please contact to Support Team.')
+
+
+
 
             return redirect('/Staff/new_admission/')
     else:
@@ -236,21 +262,28 @@ def student_fees_dashboard(request,id):
                 form_receive_fees.save()
                 messages.success(request, 'Fees Received Successfully...!')
                 
-                name = dt.student_name 
-                installment_number = 3
-                amount = request.POST.get('received_amount') 
-                sender_name = "IMS"
-                message = f"Dear {name}, You have successfully paid installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
 
-                auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
-                mobiles = dt.student_mobile 
-                message = message
-                sender = "PWRDAS"
-                route = "4"
-                unicode = "0"
-                pe_id = "1701163403601611113"
-                template_id = "1707163436871688505"
-                send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+            get_sms_data=get_object_or_404(CustomUser,institute_code=request.user.institute_code,is_institute=True)
+
+            if get_sms_data.is_txt_sms == True:
+                if int(get_sms_data.no_of_txt_sms) > 0:
+                    name = dt.student_name 
+                    amount = request.POST.get('received_amount') 
+                    message = f"Dear {name}, You have successfully paid installment of amount Rs.{amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
+                    auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
+                    mobiles = dt.student_mobile 
+                    sender = "PWRDAS"
+                    route = "4"
+                    unicode = "0"
+                    pe_id = "1701163403601611113"
+                    template_id = "1707163436871688505"
+                    try:
+                        send_txt_sms(auth_key, mobiles, message, sender, route, unicode, pe_id, template_id)
+                        get_sms_data.no_of_txt_sms=int(get_sms_data.no_of_txt_sms) - 1
+                        get_sms_data.save()  
+                    except:
+                        messages.warning(request, 'Addmission Success but Problem with SMS please contact to Support Team.')
+
                 form_receive_fees = FormStudentReceivedFees()
                 return redirect(f'/Staff/student_fees_dashboard/{id}')
         
@@ -480,7 +513,7 @@ def student_result_list(request):
 @login_required(login_url='/login/')
 def student_result_dashboard(request,id):
     student_profile_record=CustomUser.objects.get(id=id)
-    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
     exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     # student_name=student_record.student_name
@@ -580,7 +613,7 @@ def student_result_dashboard(request,id):
                 else:
                     st_result="Pass"
 
-                if st_total_out_off >0:
+                if st_total_out_off > 0:
                     st_percentage=(st_total_obtained/st_total_out_off)*100
                 else:
                     st_percentage="---"
@@ -614,19 +647,22 @@ def student_result_dashboard(request,id):
                 return render(request,'staff__print_result_exam_wise.html',context)
             
         return redirect('student_result_dashboard', id=id)        
-
-    labels = []
-    data_chart = []
-    if result_record.count() != 0:
-        for i in result_record:
-            if i.subject_name not in labels:
-                labels.append(str(i.subject_name))
-            index_val=labels.index(i.subject_name)
-            if index_val < len(data_chart):
-                data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
-            else:
-                data_chart.append(int(i.obtained_marks))
-    subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class,institute_code=request.user.institute_code)
+    try:
+        labels = []
+        data_chart = []
+        if result_record.count() != 0:
+            for i in result_record:
+                if not i.result == 'Absent':
+                    if i.subject_name not in labels:
+                        labels.append(str(i.subject_name))
+                    index_val=labels.index(i.subject_name)
+                    if index_val < len(data_chart):
+                        data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
+                    else:
+                        data_chart.append(int(i.obtained_marks))
+        subjects=DB_Subjects.objects.filter(class_name=student_profile_record.student_class,institute_code=request.user.institute_code)
+    except:
+        return render(request,'404.html')
     context={'subject_name':subjects,'st_data':student_profile_record,'result_record':result_record,'exam_record':exam_name,'labels':labels,'data':data_chart}
     return render(request,'staff__student_result_dashboard.html',context)
 
@@ -803,7 +839,6 @@ def update_attendance(request):
         formset = MyFormSet(request.POST)
         if formset.is_valid():
             for form in formset:
-                print(form.cleaned_data['id'])
                 attendance_id = form.cleaned_data['id']
                 is_present = form.cleaned_data['is_present']
                 DB_Attendance.objects.filter(id=attendance_id).update(is_present=is_present)
@@ -932,6 +967,233 @@ def import_export(request):
             # messages.success (request, 'Data imported successfully')
         else:
             messages.error(request, 'Please select a file to import')
-
     return render(request,"staff__import_export.html")
 
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def config_result(request):
+    session_result_config_class_name=""
+    exam_name=""
+    session_result_config_exam_name=""
+    subject_name=""
+    session_result_config_subject_name=""
+    session_result_config_min_marks=""
+    session_result_config_out_of_marks=""
+    exam_alredy_exist=False 
+
+    class_names = DB_Schedule_Exam.objects.values('class_name').distinct()
+    subject_name = DB_Subjects.objects.filter(class_name=request.session.get('session_result_config_class_name'),institute_code=request.user.institute_code)
+    # try:
+    if request.method=="POST":
+        if 'class_name' in request.POST: 
+            request.session['session_result_config_class_name'] = request.POST.get('class_name') 
+            session_result_config_class_name=request.session.get('session_result_config_class_name')
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+
+        if 'exam_name' in request.POST: 
+            session_result_config_class_name=request.session.get('session_result_config_class_name')
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+
+            request.session['session_result_config_exam_name'] = request.POST.get('exam_name') 
+            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+
+        if 'subject_name' in request.POST: 
+            session_result_config_class_name=request.session.get('session_result_config_class_name')
+            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+            subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
+            request.session['session_result_config_subject_name'] = request.POST.get('subject_name') 
+            session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
+
+            exam_details=request.session.get('session_result_config_exam_name')
+            exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
+
+            result_record=DB_Result.objects.filter(subject_name=session_result_config_subject_name,exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date)
+            if result_record.exists():
+                exam_alredy_exist=True
+                dt=result_record.first() 
+                request.session['session_result_config_min_marks'] = dt.min_marks
+                request.session['session_result_config_out_of_marks'] = dt.out_off_marks
+                session_result_config_min_marks=request.session.get('session_result_config_min_marks') 
+                session_result_config_out_of_marks=request.session.get('session_result_config_out_of_marks')
+                request.session['is_session_result_config_exist'] = True
+
+        if 'min_marks' in request.POST: 
+            session_result_config_class_name=request.session.get('session_result_config_class_name')
+            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+            subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
+            session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
+
+            request.session['session_result_config_min_marks'] = request.POST.get('min_marks') 
+            request.session['session_result_config_out_of_marks'] = request.POST.get('out_of_marks') 
+            session_result_config_min_marks=request.session.get('session_result_config_min_marks') 
+            session_result_config_out_of_marks=request.session.get('session_result_config_out_of_marks')
+
+            if session_result_config_min_marks and session_result_config_out_of_marks:
+                request.session['is_session_result_config_exist'] = True
+            else:
+                request.session['is_session_result_config_exist'] = False
+    # except:
+    #     return render(request,'404.html')
+    context={
+            'class_name':class_names,
+            'session_result_config_class_name':session_result_config_class_name,
+            'exam_name':exam_name,
+            'session_result_config_exam_name':session_result_config_exam_name,
+            'subject_name':subject_name,
+            'session_result_config_subject_name':session_result_config_subject_name,
+            'session_result_config_min_marks':session_result_config_min_marks,
+            'session_result_config_out_of_marks':session_result_config_out_of_marks,
+            'exam_alredy_exist':exam_alredy_exist} 
+    return render(request,'staff__bulk_result_creation_config.html',context)
+
+@is_session_result_config_exist
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def create_bulk_result(request): 
+    session_result_config_class_name=request.session.get('session_result_config_class_name')   
+    
+    student_record=CustomUser.objects.filter(is_student=True,student_class=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+
+    initial_data = [{'student_prn_no': student.student_prn_no,'student_name': student.student_name} for student in student_record]
+    MyFormSet = formset_factory(BulkResultForm, extra=0)
+    try:
+        exam_details=request.session.get('session_result_config_exam_name')
+        exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
+    
+        if request.method == 'POST':
+            formset = MyFormSet(request.POST)
+            if formset.is_valid():
+                for form in formset:
+                    obt_marks = form['obtained_marks'].value() 
+                    out_of_marks=request.session.get('session_result_config_out_of_marks')
+                    if obt_marks.isdigit():
+                        percentage=(int(obt_marks)/int(request.session.get('session_result_config_out_of_marks')))*100
+                    else:
+                        percentage=None
+
+                    min_marks=request.session.get('session_result_config_min_marks')
+                    
+                    if obt_marks.isdigit():
+                        if int(min_marks) <= int(obt_marks):
+                            result="Pass"
+                        elif obt_marks == int(out_of_marks):
+                            result="Pass"
+                        else:
+                            result="Fail"
+                    else:
+                            result="Absent"
+                    fm = form.save(commit=False)
+                    fm.student_name = form['student_name'].value() 
+                    fm.student_class = session_result_config_class_name
+                    fm.academic_session = request.user.academic_session
+                    fm.institute_code = request.user.institute_code
+                    fm.subject_name=request.session.get('session_result_config_subject_name')
+                    fm.student_class=request.session.get('session_result_config_class_name')
+                    fm.min_marks=min_marks
+                    fm.out_off_marks=out_of_marks
+                    fm.percentage=percentage
+                    fm.exam_title=exam_title
+                    fm.exam_start_date=exam_start_date
+                    fm.exam_end_date=exam_end_date
+                    fm.result=result
+                    fm.save()
+
+                messages.success(request,'Result Created Successfully!!!')
+                request.session['is_session_result_config_exist'] = False 
+                return redirect('/Staff/student_result_list/')
+            else: 
+                messages.warning(request, 'Form Not Valid')
+        else: 
+            formset = MyFormSet(initial=initial_data)
+    except:
+        return render(request,'404.html')
+    
+    total_student=student_record.count()
+    contaxt={'exam_title':exam_title, 
+             'exam_start_date':exam_start_date, 
+             'exam_end_date':exam_end_date,
+             'min_marks':request.session.get('session_result_config_min_marks'),
+             'out_of_marks':request.session.get('session_result_config_out_of_marks'),
+             'class_name':request.session.get('session_result_config_class_name'),
+             'subject_name':request.session.get('session_result_config_subject_name'),
+             'total_student':total_student,
+             'formset':formset,
+             'class_name':session_result_config_class_name,
+             'student_record':student_record
+             
+             }
+    return render(request, "staff__create_bulk_result_form.html",contaxt)
+
+from .forms import UpdateBulkResultForm   
+@is_session_result_config_exist
+@user_passes_test(lambda user: user.is_staff)
+@login_required(login_url='/login/')
+def update_bulk_result(request): 
+    session_result_config_class_name=request.session.get('session_result_config_class_name')      
+    session_result_config_exam_name=request.session.get('session_result_config_exam_name')
+    
+    exam_details=request.session.get('session_result_config_exam_name')
+    exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
+    
+    student_record=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,student_class=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+
+    initial_data = [{'id':student.id,'student_name': student.student_name,'obtained_marks':student.obtained_marks,'student_prn_no': student.student_prn_no} for student in student_record]
+    MyFormSet = formset_factory(UpdateBulkResultForm, extra=0)
+    try:
+        exam_details=request.session.get('session_result_config_exam_name')
+        exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
+    
+        if request.method == 'POST':
+            formset = MyFormSet(request.POST)
+            if formset.is_valid():
+                for form in formset:
+                    obt_marks = form['obtained_marks'].value() 
+                    out_of_marks=request.session.get('session_result_config_out_of_marks')
+
+                    if obt_marks.isdigit():
+                        percentage=(int(obt_marks)/int(request.session.get('session_result_config_out_of_marks')))*100
+                    else:
+                        percentage=None
+
+                    min_marks=request.session.get('session_result_config_min_marks')
+                    
+                    if obt_marks.isdigit():
+                        if int(min_marks) <= int(obt_marks):
+                            result="Pass"
+                        elif obt_marks == int(out_of_marks):
+                            result="Pass"
+                        else:
+                            result="Fail"
+                    else:
+                            result="Absent"
+                    
+                    result_id=form['id'].value()
+                    DB_Result.objects.filter(id=result_id).update(obtained_marks=obt_marks,result=result)
+
+                messages.success(request,'Result Updated Successfully!!!')
+                request.session['is_session_result_config_exist'] = False 
+                return redirect('/Staff/student_result_list/')
+            else: 
+                messages.warning(request, 'Form Not Valid')
+        else: 
+            formset = MyFormSet(initial=initial_data)
+    except:
+        return render(request,'404.html')
+    total_student=student_record.count()
+    context={'exam_title':exam_title, 
+             'exam_start_date':exam_start_date, 
+             'exam_end_date':exam_end_date,
+             'min_marks':request.session.get('session_result_config_min_marks'),
+             'out_of_marks':request.session.get('session_result_config_out_of_marks'),
+             'class_name':request.session.get('session_result_config_class_name'),
+             'subject_name':request.session.get('session_result_config_subject_name'),
+             'total_student':total_student,
+             'formset':formset,
+             'class_name':session_result_config_class_name,
+             'student_record':student_record
+             } 
+    return render(request, "staff__update_bulk_result_form.html",context) 
+
+    

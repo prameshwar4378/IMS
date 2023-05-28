@@ -1,7 +1,9 @@
 table heading color : rgb(3, 119, 202) 
-add krishna thore direct from git hub
-SnyamTech Software Solution
-krishna thore
+
+
+
+
+Bulk Result Creation if result obtained_marks 100 then showing result fail should be pass
 
 
 Institute

@@ -72,26 +72,28 @@ def student_dashboard(request):
     label_subject_name_result=[]
     data_marks_result=[]
     for i in result_records:
-        if i.subject_name in label_subject_name_result:
-            subject_index_value=label_subject_name_result.index(i.subject_name)
-            data_marks_result[subject_index_value]+=int(i.obtained_marks)
-        else:
-            label_subject_name_result.append(i.subject_name)
-            data_marks_result.append(int(i.obtained_marks)) 
+        if not i.result == "Absent":
+            if i.subject_name in label_subject_name_result:
+                subject_index_value=label_subject_name_result.index(i.subject_name)
+                data_marks_result[subject_index_value]+=int(i.obtained_marks)
+            else:
+                label_subject_name_result.append(i.subject_name)
+                data_marks_result.append(int(i.obtained_marks)) 
 
     subject_marks_rec=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     label_subject_name_progress=[]
     data_marks_progress=[]
     total_out_of=[]
     for i in subject_marks_rec:
-        if i.subject_name in label_subject_name_progress:
-            subject_index_value=label_subject_name_progress.index(i.subject_name)
-            data_marks_progress[subject_index_value]+=int(i.obtained_marks)
-            total_out_of[subject_index_value]+=int(i.out_off_marks)
-        else:
-            label_subject_name_progress.append(i.subject_name)
-            data_marks_progress.append(int(i.obtained_marks)) 
-            total_out_of.append(int(i.out_off_marks)) 
+        if not i.result == "Absent":
+            if i.subject_name in label_subject_name_progress:
+                subject_index_value=label_subject_name_progress.index(i.subject_name)
+                data_marks_progress[subject_index_value]+=int(i.obtained_marks)
+                total_out_of[subject_index_value]+=int(i.out_off_marks)
+            else:
+                label_subject_name_progress.append(i.subject_name)
+                data_marks_progress.append(int(i.obtained_marks)) 
+                total_out_of.append(int(i.out_off_marks)) 
 
     average_marks=[]
     for i in range(len(data_marks_progress)):
@@ -192,7 +194,7 @@ def result_dashboard(request):
             return redirect('/Student/result_dashboard/')
     # code for update session common for all function End
     PRN_NO=request.user.student_prn_no
-    result_record=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    result_record=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
     exam_name = DB_Schedule_Exam.objects.filter(class_name=request.user.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     if request.POST:
@@ -223,12 +225,13 @@ def result_dashboard(request):
             st_total_min=0
             st_result=[]
             for i in result_data:
-                labels_charts.append(i.subject_name)
-                data_charts.append(i.obtained_marks)
-                st_total_obtained+=int(i.obtained_marks)
-                st_total_out_off+=int(i.out_off_marks)
-                st_total_min+=int(i.min_marks)
-                st_result.append(i.result)
+                if not i.obtained_marks == None: 
+                    labels_charts.append(i.subject_name)
+                    data_charts.append(i.obtained_marks)
+                    st_total_obtained+=int(i.obtained_marks)
+                    st_total_out_off+=int(i.out_off_marks)
+                    st_total_min+=int(i.min_marks)
+                    st_result.append(i.result) 
 
             if "Fail" in st_result:
                 st_result="Fail"
@@ -265,19 +268,20 @@ def result_dashboard(request):
                         'labels_charts':labels_charts,
                         'data_charts':data_charts,
                         }
-            
             return render(request,'staff__print_result_exam_wise.html',context)
+    
     labels = []
     data_chart = []
     if result_record.count() != 0:
         for i in result_record:
-            if i.subject_name not in labels:
-                labels.append(str(i.subject_name))
-            index_val=labels.index(i.subject_name)
-            if index_val < len(data_chart):
-                data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
-            else:
-                data_chart.append(int(i.obtained_marks))
+            if not i.result == "Absent":
+                if i.subject_name not in labels:
+                    labels.append(str(i.subject_name))
+                index_val=labels.index(i.subject_name)
+                if index_val < len(data_chart):
+                    data_chart[index_val]=data_chart[index_val]+int(i.obtained_marks)
+                else:
+                    data_chart.append(int(i.obtained_marks))
 
     subjects=DB_Subjects.objects.filter(class_name=request.user.student_class,institute_code=request.user.institute_code)
 

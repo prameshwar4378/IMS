@@ -32,6 +32,8 @@
                                         <th scope="col" class="text-center text-white" style="">Institute Name</th>
                                         <th scope="col" class="text-center text-white" style="">Logo</th>
                                         <th scope="col" class="text-center text-white" style="">institue code</th>
+                                        <th scope="col" class="text-center text-white" style="">Is Text SMS</th>
+                                        <th scope="col" class="text-center text-white" style="">Available Msg</th>
                                         <th scope="col" class="text-center text-white" style="">Action</th>
                                 </tr>
                             </thead>
@@ -52,6 +54,8 @@
                                         {% endif %}
                                     </td> 
                                     <td>{{r.institute_code}}</td> 
+                                    <td>{{r.is_txt_sms}}</td> 
+                                    <td>{{r.no_of_txt_sms}}</td> 
                                      
                                     <td>
                                         <center>

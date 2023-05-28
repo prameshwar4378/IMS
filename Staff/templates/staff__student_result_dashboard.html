@@ -101,9 +101,20 @@
                                                 {{r.exam_end_date}}</span></td>
                                         <td>{{r.subject_name}}</td>
                                         <td>{{r.min_marks}}</td>
+
+                                        {% if r.result == "Absent" %}
+                                        <td>---</td>
+                                        {% else %}
                                         <td>{{r.obtained_marks}}</td>
+                                        {% endif %}
+
                                         <td>{{r.out_off_marks}}</td>
+                                        
+                                        {% if r.result == "Absent" %}
+                                        <td>---</td>
+                                        {% else %}
                                         <td>{{r.percentage|floatformat:2}}%</td>
+                                        {% endif %}
                                         <td>{{r.result}}</td>
                                         <td>
                                             <a href=" " data-toggle="modal" data-target="#update_result"
