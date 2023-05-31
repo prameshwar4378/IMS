@@ -38,6 +38,7 @@ urlpatterns = [
     path('config_result',Staff_view.config_result, name='config_result'), 
     path('create_bulk_result',Staff_view.create_bulk_result, name='create_bulk_result'), 
     path('update_bulk_result',Staff_view.update_bulk_result, name='update_bulk_result'), 
+    path('declare_result',Staff_view.declare_result, name='declare_result'), 
 ]
 if settings.DEBUG: 
     urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

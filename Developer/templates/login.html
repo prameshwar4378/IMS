@@ -450,7 +450,7 @@ form.sign-in-form {
           <form action="#" class="sign-in-form" method="POST"> {% csrf_token %}
              {% if request.user.is_superuser %}
              <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
-             <span style="position: relative; top:-10px; color:gray;">Developer</span><br>
+             <span style="position: relative; top:-10px; color:gray;">Developer </span><br>
              {% elif request.user.is_institute %}
              <h2 class="title"><span style="font-size:30px;color:#4d84e2;">Welcome,</span> {{request.user.username}}</h2>
              <span style="position: relative; top:-10px; color:gray;">Institute</span><br>

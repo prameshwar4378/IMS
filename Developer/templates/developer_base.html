@@ -176,7 +176,7 @@
   <ul class="sidebar-nav" id="sidebar-nav">
 
     <li class="nav-item">
-          <a class="nav-link " href="{% url 'institute_dashboard' %}">
+          <a class="nav-link " href="">
               <i class="bi bi-grid"></i>
               <span>DASHBOARD</span>
           </a>
@@ -191,9 +191,21 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link " href="{% url 'institute_list' %}">
+        <a class="nav-link " href="{% url 'developer_institute_list' %}">
           <i class="bi bi-card-list"></i>
             <span>Institute List</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'developer_staff_list' %}">
+          <i class="bi bi-card-list"></i>
+            <span>Staff List</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link " href="{% url 'error_list' %}">
+          <i class="bi bi-card-list"></i>
+            <span>Error List</span>
         </a>
       </li>
 

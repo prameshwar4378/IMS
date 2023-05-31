@@ -67,102 +67,110 @@ def update_academic_session(request):
 @user_passes_test(lambda user: user.is_staff)
 @login_required(login_url='/login/')
 def staff_dashboard(request):
-    today = date.today()
-    student_records=CustomUser.objects.filter(is_student=True,date_time__date=today,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
-    today_admission=student_records.count()
+    try:
+        today = date.today()
+        student_records=CustomUser.objects.filter(is_student=True,date_time__date=today,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        today_admission=student_records.count()
 
-    fees_records=DB_Fees.objects.filter(date_time__date=today,received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
-    total_fees=0
-    for i in fees_records:
-        total_fees+=int(i.received_amount)
+        fees_records=DB_Fees.objects.filter(date_time__date=today,received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        total_fees=0
+        for i in fees_records:
+            total_fees+=int(i.received_amount)
 
-    total_present_students=DB_Attendance.objects.filter(date_time__date=today,is_present=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
-    total_students=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
-    if total_students > 0:
-        present_student_in_percentage=(total_present_students/total_students)*100
-    else:
-        present_student_in_percentage=0
-    
-    allocated_fees_DB=DB_Fees.objects.filter(add_fees__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
-    total_allocated_fees=0
-    for i in allocated_fees_DB:
-        total_allocated_fees+=int(i.add_fees)
-    collected_fees_DB=DB_Fees.objects.filter(received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
-    total_collected_amount=0
-    for i in collected_fees_DB:
-        amount=i.received_amount
-        total_collected_amount+=int(amount)
-    total_pending_fees=total_allocated_fees-total_collected_amount
-    label_expenses=['Allocated Fees','Collected Fees','Pending_fees']
-    data_expenses=[total_allocated_fees,total_collected_amount,total_pending_fees]
+        total_present_students=DB_Attendance.objects.filter(date_time__date=today,is_present=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
+        total_students=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code).count()
+        if total_students > 0:
+            present_student_in_percentage=(total_present_students/total_students)*100
+        else:
+            present_student_in_percentage=0
+        
+        allocated_fees_DB=DB_Fees.objects.filter(add_fees__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        total_allocated_fees=0
+        for i in allocated_fees_DB:
+            total_allocated_fees+=int(i.add_fees)
+        collected_fees_DB=DB_Fees.objects.filter(received_amount__isnull=False,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        total_collected_amount=0
+        for i in collected_fees_DB:
+            amount=i.received_amount
+            total_collected_amount+=int(amount)
+        total_pending_fees=total_allocated_fees-total_collected_amount
+        label_expenses=['Allocated Fees','Collected Fees','Pending_fees']
+        data_expenses=[total_allocated_fees,total_collected_amount,total_pending_fees]
 
-    student_data_male_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Male").count()
-    student_data_female_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Female").count()
-    label_active_students=['Male','Female']
-    data_active_students=[student_data_male_for_charts,student_data_female_for_charts]
+        student_data_male_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Male").count()
+        student_data_female_for_charts=CustomUser.objects.filter(is_student=True,academic_session=request.user.academic_session,institute_code=request.user.institute_code,student_gender="Female").count()
+        label_active_students=['Male','Female']
+        data_active_students=[student_data_male_for_charts,student_data_female_for_charts]
 
-    exam_schedule_records=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code).last()
-    if exam_schedule_records:
-        exam_name_for_result_chart = f"{exam_schedule_records.exam_title} ({exam_schedule_records.exam_start_date} To {exam_schedule_records.exam_end_date})"
-    else:
-        exam_name_for_result_chart=""
+        exam_schedule_records=DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code).last()
+        if exam_schedule_records:
+            exam_name_for_result_chart = f"{exam_schedule_records.exam_title} ({exam_schedule_records.exam_start_date} To {exam_schedule_records.exam_end_date})"
+        else:
+            exam_name_for_result_chart=""
 
-    if exam_schedule_records:
-        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title,institute_code=request.user.institute_code,academic_session=request.user.academic_session)
-    else:
-        result_records=""
+        if exam_schedule_records:
+            result_records=DB_Result.objects.filter(is_publish=True,exam_title=exam_schedule_records.exam_title,institute_code=request.user.institute_code,academic_session=request.user.academic_session)
+        else:
+            result_records=""
 
-    label_subject_name_result=[]
-    data_marks_result=[]
-    for i in result_records:
-        if not i.result =='Absent':
-            if i.subject_name in label_subject_name_result:
-                subject_index_value=label_subject_name_result.index(i.subject_name)
-                data_marks_result[subject_index_value]+=int(i.obtained_marks)
-            else:
-                label_subject_name_result.append(i.subject_name)
-                data_marks_result.append(int(i.obtained_marks)) 
+        label_subject_name_result=[]
+        data_marks_result=[]
+        for i in result_records:
+            if not i.result =='Absent':
+                if i.subject_name in label_subject_name_result:
+                    subject_index_value=label_subject_name_result.index(i.subject_name)
+                    data_marks_result[subject_index_value]+=int(i.obtained_marks)
+                else:
+                    label_subject_name_result.append(i.subject_name)
+                    data_marks_result.append(int(i.obtained_marks)) 
 
-    label_notification=['Active','Inactive']
-    data_notification=[]
-    notification_rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
-    active=0
-    inactive=0
+        label_notification=['Active','Inactive']
+        data_notification=[]
+        notification_rec=DB_Web_Notification.objects.filter(academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        active=0
+        inactive=0
 
-    
-    for i in notification_rec:
-        if not i.notification_valid_up_to:
-            active+=1
-            continue
-        elif today < i.notification_valid_up_to:
-            active+=1
-        elif today > i.notification_valid_up_to:
-            inactive+=1
-    data_notification.append(active)
-    data_notification.append(inactive)
+        
+        for i in notification_rec:
+            if not i.notification_valid_up_to:
+                active+=1
+                continue
+            elif today < i.notification_valid_up_to:
+                active+=1
+            elif today > i.notification_valid_up_to:
+                inactive+=1
+        data_notification.append(active)
+        data_notification.append(inactive)
 
-    get_sms_data=get_object_or_404(CustomUser,institute_code=request.user.institute_code,is_institute=True)
-
-    context={
-            'no_of_txt_sms':get_sms_data.no_of_txt_sms,
-            'is_txt_sms':get_sms_data.is_txt_sms,
-            'today_admission':today_admission,
-            'total_fees':total_fees,
-            'total_present_students':total_present_students,
-            'present_student_in_percentage':present_student_in_percentage,
-            'total_allocated_fees':total_allocated_fees,
-            'total_collected_amount':total_collected_amount,
-            'total_pending_fees':total_pending_fees,
-            'labels_charts_expenses':label_expenses,
-             'data_charts_expenses':data_expenses,
-             'label_active_students':label_active_students,
-             'data_active_students':data_active_students,
-            'exam_name_for_result_chart':exam_name_for_result_chart,
-            'label_subject_name_result':label_subject_name_result,
-            'data_marks_result':data_marks_result,
-            'label_notification':label_notification,
-            'data_notification':data_notification,
-             }
+        get_sms_data=get_object_or_404(CustomUser,institute_code=request.user.institute_code,is_institute=True)
+        chek_profile_valid_or_not=CustomUser.objects.get(institute_code=request.user.institute_code,is_institute=True)
+        valid_days= (chek_profile_valid_or_not.profile_valid_up_to - datetime.now().date()).days
+        if valid_days == 0 or valid_days < 0:
+            messages.info(request,"Profile Validity Expired Please Contact to Support Team")
+            return redirect('/logout')
+        context={
+                'no_of_txt_sms':get_sms_data.no_of_txt_sms,
+                'is_txt_sms':get_sms_data.is_txt_sms,
+                'today_admission':today_admission,
+                'total_fees':total_fees,
+                'total_present_students':total_present_students,
+                'present_student_in_percentage':present_student_in_percentage,
+                'total_allocated_fees':total_allocated_fees,
+                'total_collected_amount':total_collected_amount,
+                'total_pending_fees':total_pending_fees,
+                'labels_charts_expenses':label_expenses,
+                'data_charts_expenses':data_expenses,
+                'label_active_students':label_active_students,
+                'data_active_students':data_active_students,
+                'exam_name_for_result_chart':exam_name_for_result_chart,
+                'label_subject_name_result':label_subject_name_result,
+                'data_marks_result':data_marks_result,
+                'label_notification':label_notification,
+                'data_notification':data_notification,
+                'valid_days':valid_days,
+                }
+    except:
+        return render(request,'404.html')
     return render(request,'staff__staff_dashboard.html',context)
 
 
@@ -217,9 +225,6 @@ def new_admission(request):
                         get_sms_data.save()  
                     except:
                         messages.warning(request, 'Addmission Success but Problem with SMS please contact to Support Team.')
-
-
-
 
             return redirect('/Staff/new_admission/')
     else:
@@ -428,6 +433,7 @@ def due_clear(request,id):
         student_name=i.student_name
         student_prn_no=i.student_prn_no
         institute_code=i.institute_code 
+        due_amount=i.due_amount
 
     insert_rec=DB_Fees(
         student_username=student_username,
@@ -446,7 +452,7 @@ def due_clear(request,id):
     insert_rec.save()
 
     dt=get_object_or_404(CustomUser,username=student_username)
-    message = f"Dear {student_name}, You have successfully paid installment of amount Rs.{received_amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
+    message = f"Dear {student_name}, You have successfully paid installment of amount Rs.{due_amount}.00. Happy Learning...! Thanks and Regards, {dt.institute_name} - PWRDAS"
     auth_key = "UGNyZ0o1SmJQd0NVTjBETzB5Z2pydz09"
     mobiles = dt.student_mobile 
     message = message
@@ -513,7 +519,7 @@ def student_result_list(request):
 @login_required(login_url='/login/')
 def student_result_dashboard(request,id):
     student_profile_record=CustomUser.objects.get(id=id)
-    result_record=DB_Result.objects.filter(student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+    result_record=DB_Result.objects.filter(is_publish=True,student_prn_no=student_profile_record.student_prn_no,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
     exam_name = DB_Schedule_Exam.objects.filter(class_name=student_profile_record.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     # student_name=student_record.student_name
@@ -587,7 +593,7 @@ def student_result_dashboard(request,id):
                 st_name=student_profile_record.student_name
                 st_prn=student_profile_record.student_prn_no
 
-                result_data = DB_Result.objects.filter(exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1)
+                result_data = DB_Result.objects.filter(is_publish=True, exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1)
                 
                 if result_data:
                     student_class = result_data.first().student_class
@@ -981,61 +987,61 @@ def config_result(request):
     session_result_config_out_of_marks=""
     exam_alredy_exist=False 
 
-    class_names = DB_Schedule_Exam.objects.values('class_name').distinct()
+    class_names = DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session, institute_code=request.user.institute_code).values_list("class_name", flat=True).distinct()
     subject_name = DB_Subjects.objects.filter(class_name=request.session.get('session_result_config_class_name'),institute_code=request.user.institute_code)
-    # try:
-    if request.method=="POST":
-        if 'class_name' in request.POST: 
-            request.session['session_result_config_class_name'] = request.POST.get('class_name') 
-            session_result_config_class_name=request.session.get('session_result_config_class_name')
-            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+    try:
+        if request.method=="POST":
+            if 'class_name' in request.POST: 
+                request.session['session_result_config_class_name'] = request.POST.get('class_name') 
+                session_result_config_class_name=request.session.get('session_result_config_class_name')
+                exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
-        if 'exam_name' in request.POST: 
-            session_result_config_class_name=request.session.get('session_result_config_class_name')
-            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+            if 'exam_name' in request.POST: 
+                session_result_config_class_name=request.session.get('session_result_config_class_name')
+                exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
-            request.session['session_result_config_exam_name'] = request.POST.get('exam_name') 
-            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+                request.session['session_result_config_exam_name'] = request.POST.get('exam_name') 
+                session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
 
-        if 'subject_name' in request.POST: 
-            session_result_config_class_name=request.session.get('session_result_config_class_name')
-            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
-            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
-            subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
-            request.session['session_result_config_subject_name'] = request.POST.get('subject_name') 
-            session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
+            if 'subject_name' in request.POST: 
+                session_result_config_class_name=request.session.get('session_result_config_class_name')
+                session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+                exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+                subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
+                request.session['session_result_config_subject_name'] = request.POST.get('subject_name') 
+                session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
 
-            exam_details=request.session.get('session_result_config_exam_name')
-            exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
+                exam_details=request.session.get('session_result_config_exam_name')
+                exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
 
-            result_record=DB_Result.objects.filter(subject_name=session_result_config_subject_name,exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date)
-            if result_record.exists():
-                exam_alredy_exist=True
-                dt=result_record.first() 
-                request.session['session_result_config_min_marks'] = dt.min_marks
-                request.session['session_result_config_out_of_marks'] = dt.out_off_marks
+                result_record=DB_Result.objects.filter(subject_name=session_result_config_subject_name,exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date)
+                if result_record.exists():
+                    exam_alredy_exist=True
+                    dt=result_record.first() 
+                    request.session['session_result_config_min_marks'] = dt.min_marks
+                    request.session['session_result_config_out_of_marks'] = dt.out_off_marks
+                    session_result_config_min_marks=request.session.get('session_result_config_min_marks') 
+                    session_result_config_out_of_marks=request.session.get('session_result_config_out_of_marks')
+                    request.session['is_session_result_config_exist'] = True
+
+            if 'min_marks' in request.POST: 
+                session_result_config_class_name=request.session.get('session_result_config_class_name')
+                session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
+                exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+                subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
+                session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
+
+                request.session['session_result_config_min_marks'] = request.POST.get('min_marks') 
+                request.session['session_result_config_out_of_marks'] = request.POST.get('out_of_marks') 
                 session_result_config_min_marks=request.session.get('session_result_config_min_marks') 
                 session_result_config_out_of_marks=request.session.get('session_result_config_out_of_marks')
-                request.session['is_session_result_config_exist'] = True
 
-        if 'min_marks' in request.POST: 
-            session_result_config_class_name=request.session.get('session_result_config_class_name')
-            session_result_config_exam_name=request.session.get('session_result_config_exam_name') 
-            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
-            subject_name = DB_Subjects.objects.filter(class_name=session_result_config_class_name,institute_code=request.user.institute_code)
-            session_result_config_subject_name=request.session.get('session_result_config_subject_name') 
-
-            request.session['session_result_config_min_marks'] = request.POST.get('min_marks') 
-            request.session['session_result_config_out_of_marks'] = request.POST.get('out_of_marks') 
-            session_result_config_min_marks=request.session.get('session_result_config_min_marks') 
-            session_result_config_out_of_marks=request.session.get('session_result_config_out_of_marks')
-
-            if session_result_config_min_marks and session_result_config_out_of_marks:
-                request.session['is_session_result_config_exist'] = True
-            else:
-                request.session['is_session_result_config_exist'] = False
-    # except:
-    #     return render(request,'404.html')
+                if session_result_config_min_marks and session_result_config_out_of_marks:
+                    request.session['is_session_result_config_exist'] = True
+                else:
+                    request.session['is_session_result_config_exist'] = False
+    except:
+        return render(request,'404.html')
     context={
             'class_name':class_names,
             'session_result_config_class_name':session_result_config_class_name,
@@ -1061,7 +1067,6 @@ def create_bulk_result(request):
     try:
         exam_details=request.session.get('session_result_config_exam_name')
         exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
-    
         if request.method == 'POST':
             formset = MyFormSet(request.POST)
             if formset.is_valid():
@@ -1144,7 +1149,7 @@ def update_bulk_result(request):
     try:
         exam_details=request.session.get('session_result_config_exam_name')
         exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
-    
+
         if request.method == 'POST':
             formset = MyFormSet(request.POST)
             if formset.is_valid():
@@ -1170,7 +1175,7 @@ def update_bulk_result(request):
                             result="Absent"
                     
                     result_id=form['id'].value()
-                    DB_Result.objects.filter(id=result_id).update(obtained_marks=obt_marks,result=result)
+                    DB_Result.objects.filter(id=result_id).update(obtained_marks=obt_marks,result=result,percentage=percentage)
 
                 messages.success(request,'Result Updated Successfully!!!')
                 request.session['is_session_result_config_exist'] = False 
@@ -1197,3 +1202,69 @@ def update_bulk_result(request):
     return render(request, "staff__update_bulk_result_form.html",context) 
 
     
+
+def declare_result(request):
+    session_result_config_class_name_for_declare_result=None
+    session_result_config_exam_name_for_declare_result=None
+    session_result_config_is_publish_for_declare_result=False
+    exam_name=None
+    class_name=None
+
+
+    class_names = DB_Schedule_Exam.objects.filter(academic_session=request.user.academic_session, institute_code=request.user.institute_code).values_list("class_name", flat=True).distinct()
+    if request.method=="POST":
+        if 'class_name' in request.POST: 
+            request.session['session_result_config_class_name_for_declare_result'] = request.POST.get('class_name') 
+            session_result_config_class_name_for_declare_result=request.session.get('session_result_config_class_name_for_declare_result')
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name_for_declare_result,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+
+        if 'exam_name' in request.POST: 
+            session_result_config_class_name_for_declare_result=request.session.get('session_result_config_class_name_for_declare_result')
+            exam_name = DB_Schedule_Exam.objects.filter(class_name=session_result_config_class_name_for_declare_result,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+            request.session['session_result_config_exam_name_for_declare_result'] = request.POST.get('exam_name') 
+            session_result_config_exam_name_for_declare_result=request.session.get('session_result_config_exam_name_for_declare_result')
+
+            exam_title, exam_start_date, exam_end_date = session_result_config_exam_name_for_declare_result.split(" | ")
+            Result_Data=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+            for i in Result_Data:
+                if i.is_publish: 
+                    request.session['session_result_config_is_publish_for_declare_result'] = True 
+                else: 
+                    request.session['session_result_config_is_publish_for_declare_result'] = False
+            session_result_config_is_publish_for_declare_result=request.session.get('session_result_config_is_publish_for_declare_result')
+
+        if 'is_publish_and_text_sms' in request.POST:
+            session_result_config_class_name_for_declare_result=request.session.get('session_result_config_class_name_for_declare_result')
+            session_result_config_exam_name_for_declare_result=request.session.get('session_result_config_exam_name_for_declare_result')
+            is_publish=request.POST.get('is_publish')
+            is_text_sms=request.POST.get('is_text_sms')
+            exam_title, exam_start_date, exam_end_date = session_result_config_exam_name_for_declare_result.split(" | ")
+            res_dt=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+            if is_publish: 
+                messages.success(request,f"{res_dt.count()} Students Result is Publish Now...!")
+                DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code).update(is_publish=True)
+            else:
+                messages.success(request,f"{res_dt.count()} Students Result is  Unpublish...!")
+                DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code).update(is_publish=False)
+
+            if is_text_sms:
+                print("is is_text_sms True")
+            else:
+                print("is is_text_sms False")
+            return redirect('/Staff/student_result_list/')
+
+    get_sms_data=CustomUser.objects.get(institute_code=request.user.institute_code,is_institute=True)
+    if get_sms_data.is_txt_sms:
+        is_txt_sms=True
+    else:
+        is_txt_sms=False
+
+    contaxt={
+        "class_name":class_names,
+        "exam_name":exam_name,
+        "is_txt_sms":is_txt_sms,
+        "session_result_config_class_name_for_declare_result":session_result_config_class_name_for_declare_result,
+        "session_result_config_exam_name_for_declare_result":session_result_config_exam_name_for_declare_result,
+        "session_result_config_is_publish_for_declare_result":session_result_config_is_publish_for_declare_result,
+    }
+    return render(request,"staff__declare_result.html",contaxt)

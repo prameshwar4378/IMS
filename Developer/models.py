@@ -17,7 +17,6 @@ FINANCIAL_YEAR = (
     ("2025-26", "2025-26"), 
     ("2026-27", "2026-27"), 
     ("2028-28", "2028-28"), 
-    
 )   
 
 
@@ -87,6 +86,7 @@ class CustomUser(AbstractUser):
     group=models.CharField(max_length=255,null=True,blank=True)
     status=models.CharField(max_length=255,null=True,choices=STUDENT_STATUS)
     date_time=models.DateTimeField(auto_now=False, auto_now_add=True,null=True)
+    profile_valid_up_to=models.DateField(auto_now=False, auto_now_add=False,null=True)
     tour_is_completed=models.BooleanField(default=False)
     is_institute_profile_completed=models.BooleanField(default=False)
     is_txt_sms=models.BooleanField(default=True)
@@ -152,6 +152,7 @@ class DB_Result(models.Model):
     exam_title=models.CharField(max_length=100, null=True)
     exam_start_date=models.CharField(max_length=100, null=True)
     exam_end_date=models.CharField(max_length=100, null=True)
+    is_publish = models.BooleanField(default=False)
 
 class DB_Schedule_Exam(models.Model):
     academic_session=models.CharField(max_length=100, null=True)

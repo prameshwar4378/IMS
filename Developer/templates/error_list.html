@@ -1,0 +1,41 @@
+{% extends 'developer_base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Error List</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Error List</a></li>
+    </ol>
+    </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="container" style="max-width:90%;">
+
+                      {% if dublicate_institue_found %}
+                      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        Dublicate Institute Code Found
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                      {% endif %}
+
+                    </div>
+                </div>
+            </div>
+        </div><!-- End Left side columns -->
+    </section>
+
+
+</main><!-- End #main -->
+
+ 
+{% endblock content %}

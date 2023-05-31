@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomStaffCreationForm,Form_Financial_Year_Session,CustomStaffUpdateForm
 from django.contrib import messages
 from Developer.models import DB_Session,CustomUser
@@ -46,14 +46,36 @@ def update_academic_session(request):
 
 @institute_required
 @profile_completed_required
-def home(request): 
-    # code for update session common for all function start
+def institute_dashboard(request): 
+      
+        # code for update session common for all function start
     if request.method=="POST":
         if 'cmb_update_academic_session' in request.POST:
             update_academic_session(request)
             return redirect('/Institute')
     # code for update session common for all function End
-    return render(request,'institute_dashboard.html')
+    get_sms_data=CustomUser.objects.get(institute_code=request.user.institute_code,is_institute=True,username=request.user.username)
+    chek_profile_valid_or_not = CustomUser.objects.filter(is_institute=True,academic_session=request.user.academic_session, institute_code=request.user.institute_code).distinct()
+    
+    for i in chek_profile_valid_or_not:
+        valid_up_to_date = i.profile_valid_up_to
+
+    from datetime import datetime
+    days_difference = (valid_up_to_date - datetime.now().date()).days
+ 
+    valid_days= int(days_difference)
+
+    if valid_days == 0 or valid_days < 0:
+        messages.info(request,"Profile Validity Expired Please Contact to Support Team")
+        return redirect('/logout')
+
+    context={
+        'chek_profile_valid_or_not':chek_profile_valid_or_not,
+        'valid_days':valid_days,
+        'no_of_txt_sms':get_sms_data.no_of_txt_sms,
+        'is_txt_sms':get_sms_data.is_txt_sms,
+    }
+    return render(request,'institute_dashboard.html',context)
 
  
 @institute_required
@@ -191,25 +213,28 @@ def complete_first_tour(request):
 @institute_required
 def complete_your_profile(request):
     # code for update session common for all function start
-    if request.method=="POST":
-        if 'cmb_update_academic_session' in request.POST:
-            update_academic_session(request)
-            return redirect('/Institute/staff_list')
-    # code for update session common for all function End
+    try:
+        if request.method=="POST":
+            if 'cmb_update_academic_session' in request.POST:
+                update_academic_session(request)
+                return redirect('/Institute/staff_list')
+        # code for update session common for all function End
 
-    username=request.user.username
-    random_letters = random.sample(username, 2)
-    auto_generate_institute_code = ''.join(random_letters).upper() + str("-") + str(10)
+        username = request.user.username
+        random_letters = random.sample(username,2)
+        Institute_Records = CustomUser.objects.filter(is_institute=True)
+        existing_codes = [record.institute_code for record in Institute_Records]
+        auto_generate_institute_code = ''.join(random_letters).upper() + str("-") + str(10)
+        while auto_generate_institute_code in existing_codes:
+            random_letters = random.sample(username, 2)
+            auto_generate_institute_code = ''.join(random_letters).upper() + str("-") + str(10)
 
-    if request.method == 'POST':
-            institute_name = request.POST.get('txt_institute_name')
-            institute_address = request.POST.get('txt_institute_address')
-            institute_code = request.POST.get('txt_institute_code')
-            institute_logo = request.FILES.get('txt_institute_logo')
-            institute_code_exist=CustomUser.objects.filter(institute_code=auto_generate_institute_code).exists()
-            if institute_code_exist:
-                messages.warning(request,"Institute Code is alredy Exist")
-            else:
+        if request.method == 'POST':
+                institute_name = request.POST.get('txt_institute_name')
+                institute_address = request.POST.get('txt_institute_address')
+                institute_code = request.POST.get('txt_institute_code')
+                institute_logo = request.FILES.get('txt_institute_logo')
+
                 user = CustomUser.objects.get(id=request.user.id)
                 user.institute_name = institute_name
                 user.institute_address = institute_address
@@ -240,4 +265,6 @@ def complete_your_profile(request):
 
                 messages.success(request, 'Profile Updated Success...!.')
                 return redirect('/Institute/')
+    except:
+        return render(request,'404.html')
     return render(request,'complete_your_profile.html',{'auto_generate_institute_code':auto_generate_institute_code})

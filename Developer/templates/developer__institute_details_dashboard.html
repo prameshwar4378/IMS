@@ -1,0 +1,155 @@
+{% extends 'developer_base.html' %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h1>Institute Details</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item"><a href="#">Institute Details</a></li>
+            </ol>
+        </nav>
+        <br>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+        <div class="row">
+
+            <!-- Left side columns -->
+            <div class="col-lg-12">
+
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <h4><b>{{institute_name}}</b></h4>
+                        <p>{{institute_address}}</p>
+                    </div>
+                    <!-- Card -->
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Total Amount</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{total_fees}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Collected Amount</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{collected_fees}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Pending Amount</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{total_pending}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Due Amount</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{pending_dues}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="row"> 
+                    <!-- Card -->
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Total Students</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{total_students}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Total Subject</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{total_subjects}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Total Exam Scheduled</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{total_exam_scheduled}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md mt-2" data-aos="zoom-in" data-aos-delay="0" data-aos-duration="1000">
+                        <div class="card text-center">
+                            <div class="card-header alert-dark text-light" style="background:#4678A4;">
+                                <b>Notifications</b>
+                            </div>
+                            <div class="card-header  py-2" data-aos="fade-down" data-aos-easing="linear"
+                                data-aos-delay="800" data-aos-duration="800">
+                                <h1 class="card-title" style="font-size:32px;"><b>{{web_notifications}}</b></h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- End Left side columns -->
+
+    </section>
+
+
+</main><!-- End #main -->
+
+
+
+
+
+
+
+
+<script>
+    table = $('#example').DataTable({
+        paging: true
+    });
+
+    table.destroy();
+
+    table = $('#example').DataTable({
+        searching: true
+    });
+</script>
+
+
+<script>
+    function delete_staff(id, staff_name) {}
+</script>
+{% endblock content %}

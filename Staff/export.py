@@ -37,7 +37,7 @@ def export_excel_deu(request):
 
 def export_result_report_subject_wise(request,subject,prn):
     template = get_template('staff__export_pdf_result_subject_wise.html')
-    result_records=DB_Result.objects.filter(subject_name=subject,student_prn_no=prn,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    result_records=DB_Result.objects.filter(is_publish=True,subject_name=subject,student_prn_no=prn,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     profile_rec=CustomUser.objects.get(student_prn_no=prn,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
 
     institute_address=profile_rec.institute_address

@@ -66,7 +66,7 @@ def student_dashboard(request):
     else:
         exam_name_for_result_chart=""
     if exam_schedule_records:
-        result_records=DB_Result.objects.filter(exam_title=exam_schedule_records.exam_title,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+        result_records=DB_Result.objects.filter(is_publish=True,exam_title=exam_schedule_records.exam_title,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     else:
         result_records=""
     label_subject_name_result=[]
@@ -80,7 +80,7 @@ def student_dashboard(request):
                 label_subject_name_result.append(i.subject_name)
                 data_marks_result.append(int(i.obtained_marks)) 
 
-    subject_marks_rec=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    subject_marks_rec=DB_Result.objects.filter(is_publish=True,student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
     label_subject_name_progress=[]
     data_marks_progress=[]
     total_out_of=[]
@@ -194,7 +194,7 @@ def result_dashboard(request):
             return redirect('/Student/result_dashboard/')
     # code for update session common for all function End
     PRN_NO=request.user.student_prn_no
-    result_record=DB_Result.objects.filter(student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
+    result_record=DB_Result.objects.filter(is_publish=True,student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
     exam_name = DB_Schedule_Exam.objects.filter(class_name=request.user.student_class,academic_session=request.user.academic_session,institute_code=request.user.institute_code).order_by('-id')
 
     if request.POST:
@@ -211,8 +211,9 @@ def result_dashboard(request):
             st_name=request.user.student_name
             st_prn=PRN_NO
 
-            result_data = DB_Result.objects.filter(exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1,student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+            result_data = DB_Result.objects.filter(is_publish=True,exam_title=title_1,exam_start_date=start_date_1,exam_end_date=end_date_1,student_prn_no=PRN_NO,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
             
+            st_class=None
             if result_data:
                 student_class = result_data.first().student_class
                 st_class=student_class
