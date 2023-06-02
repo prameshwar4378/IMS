@@ -65,15 +65,11 @@ def login(request):
             username = request.POST.get('txt_sign_up_username', False)
             email = request.POST.get('txt_sign_up_email', False)
             password = request.POST.get('txt_sign_up_password', False)
-
             request.session['get_session_password']=request.POST.get('txt_sign_up_password'),
-            
             profile_valid_upto = datetime.now() + timedelta(days=15)
-
             if len(username)<5:
                 messages.info(request,'Username should atleast 5 characters')
                 return redirect('/accounts/login/')
-
             if CustomUser.objects.filter(username=username).exists():
                 messages.info(request,'Username already exists!')
             else:
@@ -257,11 +253,7 @@ def import_export(request):
                 
     return render(request,'import_export.html')
 
-
-
-
 from django.db.models import Count
-
 def error_list(request):
     profile_data=CustomUser.objects.all()
     duplicate_records = CustomUser.objects.values('institute_code', 'is_institute').annotate(count=Count('id')).filter(count__gt=1)

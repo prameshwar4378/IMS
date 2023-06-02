@@ -1138,11 +1138,12 @@ from .forms import UpdateBulkResultForm
 def update_bulk_result(request): 
     session_result_config_class_name=request.session.get('session_result_config_class_name')      
     session_result_config_exam_name=request.session.get('session_result_config_exam_name')
+    session_result_config_subject_name=request.session.get('session_result_config_subject_name')
     
     exam_details=request.session.get('session_result_config_exam_name')
     exam_title, exam_start_date, exam_end_date =exam_details.split(" | ")
     
-    student_record=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,student_class=session_result_config_class_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+    student_record=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,student_class=session_result_config_class_name,subject_name=session_result_config_subject_name,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
 
     initial_data = [{'id':student.id,'student_name': student.student_name,'obtained_marks':student.obtained_marks,'student_prn_no': student.student_prn_no} for student in student_record]
     MyFormSet = formset_factory(UpdateBulkResultForm, extra=0)
@@ -1239,7 +1240,7 @@ def declare_result(request):
             is_publish=request.POST.get('is_publish')
             is_text_sms=request.POST.get('is_text_sms')
             exam_title, exam_start_date, exam_end_date = session_result_config_exam_name_for_declare_result.split(" | ")
-            res_dt=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code)
+            res_dt=DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code).values('student_prn_no').distinct()
             if is_publish: 
                 messages.success(request,f"{res_dt.count()} Students Result is Publish Now...!")
                 DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code).update(is_publish=True)
@@ -1247,10 +1248,13 @@ def declare_result(request):
                 messages.success(request,f"{res_dt.count()} Students Result is  Unpublish...!")
                 DB_Result.objects.filter(exam_title=exam_title,exam_start_date=exam_start_date,exam_end_date=exam_end_date,academic_session=request.user.academic_session,institute_code=request.user.institute_code).update(is_publish=False)
 
+            student_prn_list = list(set([item['student_prn_no'] for item in res_dt]))
+            student_rec = CustomUser.objects.filter(student_prn_no__in=student_prn_list).values_list('student_name','student_mobile')
             if is_text_sms:
-                print("is is_text_sms True")
-            else:
-                print("is is_text_sms False")
+                for i in student_rec:
+                    print(i[0],'=',i[1]) 
+                    # msg=f"Dear {student_name}, The class {class_name} and exam {exam_name} have been declared. Thanks and regards, {institute_name}"
+
             return redirect('/Staff/student_result_list/')
 
     get_sms_data=CustomUser.objects.get(institute_code=request.user.institute_code,is_institute=True)
